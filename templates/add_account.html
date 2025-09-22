@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Add Account - PaisaTrack{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Add Account</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="account_type" class="form-label">Account Type</label>
+                        <select class="form-select" id="account_type" name="account_type" required>
+                            <option value="">Select Account Type</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Debit Card">Debit Card</option>
+                            <option value="Credit Card">Credit Card</option>
+                            <option value="Bank Account">Bank Account</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="initial_amount" class="form-label">Initial Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input type="number" class="form-control" id="initial_amount" name="initial_amount" step="0.01" required>
+                        </div>
+                        <div class="form-text">For Credit Cards, enter the credit limit.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="last_digits" class="form-label">Last 4 Digits (Optional)</label>
+                        <input type="text" class="form-control" id="last_digits" name="last_digits" maxlength="4" placeholder="1234">
+                        <div class="form-text">For cards and bank accounts only.</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Add Account
+                    </button>
+                    <a href="{{ url_for('main.accounts') }}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Account Types</h5>
+                <ul>
+                    <li><strong>Cash:</strong> Physical cash you have</li>
+                    <li><strong>Debit Card:</strong> Linked to your bank account</li>
+                    <li><strong>Credit Card:</strong> Credit line you can borrow against</li>
+                    <li><strong>Bank Account:</strong> Savings or checking account</li>
+                </ul>
+                <p class="text-muted">
+                    <i class="bi bi-info-circle"></i> You can add multiple accounts of the same type.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

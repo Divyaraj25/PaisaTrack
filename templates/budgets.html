@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Budgets - PaisaTrack{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Budgets</h1>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <a href="{{ url_for('main.add_budget') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Set Budget
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        {% if budgets %}
+        {% for budget in budgets %}
+        <div class="card mb-3 budget-card {% if budget.remaining < 0 %}over-budget{% elif budget.percentage > 90 %}near-budget{% else %}within-budget{% endif %}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title mb-0">{{ budget.category }}</h5>
+                    <span class="badge bg-{% if budget.status == 'ACTIVE' %}success{% else %}secondary{% endif %} badge-status">
+                        {{ budget.status }}
+                    </span>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Budget Amount:</strong> ₹{{ "%.2f"|format(budget.amount) }}</p>
+                        <p class="mb-1"><strong>Period:</strong> {{ budget.start_date }} to {{ budget.end_date }} ({{ budget.period|title }})</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Spent:</strong> ₹{{ "%.2f"|format(budget.spent) }} ({{ "%.1f"|format(budget.percentage) }}%)</p>
+                        <p class="mb-1"><strong>Remaining:</strong> 
+                            {% if budget.remaining < 0 %}
+                                <span class="text-danger">-₹{{ "%.2f"|format(budget.remaining|abs) }}</span>
+                            {% else %}
+                                ₹{{ "%.2f"|format(budget.remaining) }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="progress mt-2">
+                    <div class="progress-bar {% if budget.percentage > 90 %}bg-danger{% elif budget.percentage > 75 %}bg-warning{% else %}bg-success{% endif %}" 
+                         role="progressbar" 
+                         aria-valuenow="{{ budget.percentage }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                    </div>
+                    <div class="progress-bar-text">{{ "%.1f"|format(budget.percentage) }}%</div>
+                </div>
+                
+                {% if budget.remaining < 0 %}
+                <div class="alert alert-danger mt-2 mb-0 py-2">
+                    <i class="bi bi-exclamation-triangle"></i> Over budget by ₹{{ "%.2f"|format(budget.remaining|abs) }}
+                </div>
+                {% elif budget.percentage > 90 %}
+                <div class="alert alert-warning mt-2 mb-0 py-2">
+                    <i class="bi bi-exclamation-circle"></i> Close to budget limit!
+                </div>
+                {% elif budget.percentage <= 90 and budget.percentage > 0 %}
+                <div class="alert alert-success mt-2 mb-0 py-2">
+                    <i class="bi bi-check-circle"></i> Within budget
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="alert alert-info">
+            <p>No budgets set.</p>
+            <a href="{{ url_for('main.add_budget') }}" class="btn btn-primary">Set your first budget</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Set progress bar widths after page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const progressBars = document.querySelectorAll('.progress-bar');
+        progressBars.forEach(function(bar) {
+            const percentage = parseFloat(bar.getAttribute('aria-valuenow'));
+            const width = percentage > 100 ? 100 : percentage;
+            bar.style.width = width + '%';
+        });
+    });
+</script>
+{% endblock %}

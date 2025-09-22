@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Information - PaisaTrack{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Finance Tracker Information</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">Introduction</h2>
+                <p>{{ info.introduction }}</p>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">Features</h2>
+                <div class="row">
+                    {% for feature, description in info.features.items() %}
+                    <div class="col-md-6 mb-3">
+                        <h5>{{ feature.replace('_', ' ').title() }}</h5>
+                        <p>{{ description }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">Calculations</h2>
+                <div class="row">
+                    {% for calc, formula in info.calculations.items() %}
+                    <div class="col-md-4 mb-3">
+                        <h5>{{ calc.replace('_', ' ').title() }}</h5>
+                        <p>{{ formula }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">Examples</h2>
+                <div class="row">
+                    {% for example_type, example in info.examples.items() %}
+                    <div class="col-md-4 mb-3">
+                        <h5>{{ example_type.replace('_', ' ').title() }}</h5>
+                        <ul class="list-group">
+                            {% for key, value in example.items() %}
+                            <li class="list-group-item">
+                                <strong>{{ key.title() }}:</strong> {{ value }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">Tips</h2>
+                <ol>
+                    {% for tip in info.tips %}
+                    <li class="mb-2">{{ tip }}</li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">How to Use</h2>
+                <div class="row">
+                    {% for section, instructions in info.how_to_use.items() %}
+                    <div class="col-md-6 mb-3">
+                        <h5>{{ section.replace('_', ' ').title() }}</h5>
+                        <p>{{ instructions }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

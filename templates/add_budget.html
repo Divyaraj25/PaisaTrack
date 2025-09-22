@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Set Budget - PaisaTrack{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Set Budget</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select class="form-select" id="category" name="category" required>
+                            <option value="">Select Expense Category</option>
+                            {% for category in categories.expense %}
+                            <option value="{{ category }}">{{ category }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Budget Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="period" class="form-label">Budget Period</label>
+                        <select class="form-select" id="period" name="period" required>
+                            <option value="">Select Period</option>
+                            <option value="custom">Custom Dates</option>
+                            <option value="weekly">Weekly (Monday to Sunday)</option>
+                            <option value="monthly">Monthly (1st to last day of month)</option>
+                            <option value="yearly">Yearly (Jan 1st to Dec 31st)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3" id="date_range" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="end_date" name="end_date">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-piggy-bank"></i> Set Budget
+                    </button>
+                    <a href="{{ url_for('main.budgets') }}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Budget Tips</h5>
+                <ul>
+                    <li>Set realistic budgets based on your historical spending</li>
+                    <li>Review and adjust budgets regularly</li>
+                    <li>Use custom dates for special occasions or events</li>
+                    <li>Set monthly budgets for regular expenses like rent and utilities</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Expense Categories</h5>
+                {% if categories.expense %}
+                <ul class="list-group list-group-flush">
+                    {% for category in categories.expense %}
+                    <li class="list-group-item">{{ category }}</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">No expense categories found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Show/hide date range based on period selection
+    document.getElementById('period').addEventListener('change', function() {
+        const dateRange = document.getElementById('date_range');
+        if (this.value === 'custom') {
+            dateRange.style.display = 'block';
+        } else {
+            dateRange.style.display = 'none';
+        }
+    });
+    
+    // Set today's date as default for date inputs
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('start_date').value = today;
+        document.getElementById('end_date').value = today;
+    });
+</script>
+{% endblock %}

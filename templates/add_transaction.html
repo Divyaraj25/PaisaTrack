@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}Add Transaction - PaisaTrack{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Add Transaction</h1>
+    </div>
+</div>
+
+<!-- Account Balances Summary -->
+{% if accounts %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Current Account Balances</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    {% for account in accounts %}
+                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
+                        <div class="card h-100 border-primary border-2">
+                            <div class="card-body">
+                                <h6 class="card-title text-primary">{{ account.account_type }}</h6>
+                                {% if account.last_digits %}
+                                <p class="card-text text-muted mb-2">****{{ account.last_digits }}</p>
+                                {% endif %}
+                                <h5 class="card-text fw-bold">
+                                    {% if account.account_type == "Credit Card" %}
+                                        {% set current_balance = balances[account.account_type] %}
+                                        {% if current_balance < 0 %}
+                                            <span class="text-danger">-₹{{ "%.2f"|format(current_balance|abs) }}</span>
+                                        {% else %}
+                                            <span class="text-success">₹{{ "%.2f"|format(current_balance) }} (Credit)</span>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if balances[account.account_type] >= 0 %}
+                                            <span class="text-success">₹{{ "%.2f"|format(balances[account.account_type]) }}</span>
+                                        {% else %}
+                                            <span class="text-danger">-₹{{ "%.2f"|format(balances[account.account_type]|abs) }}</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Hidden elements to store category data -->
+<div id="category-data" style="display: none;">
+    <span id="income-categories" data-categories='{{ categories.income|tojson|safe }}'></span>
+    <span id="expense-categories" data-categories='{{ categories.expense|tojson|safe }}'></span>
+    <span id="transfer-categories" data-categories='{{ categories.transfer|tojson|safe }}'></span>
+</div>
+
+<script>
+    // Set today's date as default and initialize event listeners when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set today's date as default
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').value = today;
+        
+        // Populate categories based on transaction type
+        document.getElementById('transaction_type').addEventListener('change', function() {
+            const type = this.value;
+            const categorySelect = document.getElementById('category');
+            const accountSelect = document.getElementById('account');
+            
+            // Clear existing options
+            categorySelect.innerHTML = '<option value="">Select Category</option>';
+            
+            // Filter accounts based on transaction type
+            if (accountSelect) {
+                const accountOptions = accountSelect.querySelectorAll('.account-option');
+                accountOptions.forEach(option => {
+                    // Hide Credit Card for income transactions
+                    if (type === 'income' && option.getAttribute('data-hide-for') === 'income') {
+                        option.style.display = 'none';
+                        option.disabled = true;
+                    } else {
+                        option.style.display = '';
+                        option.disabled = false;
+                    }
+                });
+            }
+            
+            // Get category data from hidden elements
+            let categories = [];
+            if (type === 'income') {
+                const incomeData = document.getElementById('income-categories').getAttribute('data-categories');
+                if (incomeData && incomeData !== 'undefined' && incomeData !== 'null' && incomeData !== '') {
+                    try {
+                        categories = JSON.parse(incomeData);
+                    } catch (e) {
+                        categories = [];
+                    }
+                }
+            } else if (type === 'expense') {
+                const expenseData = document.getElementById('expense-categories').getAttribute('data-categories');
+                if (expenseData && expenseData !== 'undefined' && expenseData !== 'null' && expenseData !== '') {
+                    try {
+                        categories = JSON.parse(expenseData);
+                    } catch (e) {
+                        categories = [];
+                    }
+                }
+            } else if (type === 'transfer') {
+                const transferData = document.getElementById('transfer-categories').getAttribute('data-categories');
+                if (transferData && transferData !== 'undefined' && transferData !== 'null' && transferData !== '') {
+                    try {
+                        categories = JSON.parse(transferData);
+                    } catch (e) {
+                        categories = [];
+                    }
+                }
+            }
+            
+            // Add categories to select
+            categories.forEach(function(category) {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            });
+            
+            // Show/hide relevant fields based on transaction type
+            document.getElementById('account_group').style.display = (type === 'income' || type === 'expense') ? 'block' : 'none';
+            document.getElementById('from_account_group').style.display = (type === 'transfer') ? 'block' : 'none';
+            document.getElementById('to_account_group').style.display = (type === 'transfer') ? 'block' : 'none';
+            document.getElementById('category_group').style.display = (type) ? 'block' : 'none';
+        });
+    });
+</script>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="transaction_type" class="form-label">Transaction Type</label>
+                        <select class="form-select" id="transaction_type" name="transaction_type" required>
+                            <option value="">Select Transaction Type</option>
+                            <option value="income">Income</option>
+                            <option value="expense">Expense</option>
+                            <option value="transfer">Transfer</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3" id="account_group" style="display: none;">
+                        <label for="account" class="form-label">Account</label>
+                        <select class="form-select" id="account" name="account">
+                            <option value="">Select Account</option>
+                            {% for account in accounts %}
+                            <option value="{{ account.account_type }}" 
+                                    class="account-option" 
+                                    data-account-type="{{ account.account_type }}"
+                                    {% if account.account_type == 'Credit Card' %}data-hide-for="income"{% endif %}>
+                                {{ account.account_type }}{% if account.last_digits %} (****{{ account.last_digits }}){% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3" id="from_account_group" style="display: none;">
+                        <label for="from_account" class="form-label">From Account</label>
+                        <select class="form-select" id="from_account" name="from_account">
+                            <option value="">Select Account</option>
+                            {% for account in accounts %}
+                            <option value="{{ account.account_type }}">{{ account.account_type }}{% if account.last_digits %} (****{{ account.last_digits }}){% endif %}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3" id="to_account_group" style="display: none;">
+                        <label for="to_account" class="form-label">To Account</label>
+                        <select class="form-select" id="to_account" name="to_account">
+                            <option value="">Select Account</option>
+                            {% for account in accounts %}
+                            <option value="{{ account.account_type }}">{{ account.account_type }}{% if account.last_digits %} (****{{ account.last_digits }}){% endif %}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3" id="category_group" style="display: none;">
+                        <label for="category" class="form-label">Category</label>
+                        <select class="form-select" id="category" name="category" required>
+                            <option value="">Select Category</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="date" name="date" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description (Optional)</label>
+                        <textarea class="form-control" id="description" name="description" rows="2"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Add Transaction
+                    </button>
+                    <a href="{{ url_for('main.transactions') }}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Transaction Types</h5>
+                <ul>
+                    <li><strong>Income:</strong> Money received (salary, gifts, etc.)</li>
+                    <li><strong>Expense:</strong> Money spent (food, rent, etc.)</li>
+                    <li><strong>Transfer:</strong> Money moved between accounts</li>
+                </ul>
+                <p class="text-muted">
+                    <i class="bi bi-info-circle"></i> Note: Credit Cards cannot receive income directly.
+                </p>
+            </div>
+        </div>
+        
+        <!-- <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Your Accounts</h5>
+                {% if accounts %}
+                <ul class="list-group list-group-flush">
+                    {% for account in accounts %}
+                    <li class="list-group-item">
+                        <strong>{{ account.account_type }}</strong>
+                        {% if account.last_digits %}<small class="text-muted">(****{{ account.last_digits }})</small>{% endif %}
+                        <br>
+                        <small class="text-muted">Balance: ₹{{ "%.2f"|format(account.initial_amount) }}</small>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">No accounts found. <a href="{{ url_for('main.add_account') }}">Add an account</a> first.</p>
+                {% endif %}
+            </div>
+        </div> -->
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Debug: Log category data to console
+    console.log('Income categories:', document.getElementById('income-categories')?.getAttribute('data-categories'));
+    console.log('Expense categories:', document.getElementById('expense-categories')?.getAttribute('data-categories'));
+    console.log('Transfer categories:', document.getElementById('transfer-categories')?.getAttribute('data-categories'));
+    
+    // Populate categories based on transaction type
+    document.getElementById('transaction_type').addEventListener('change', function() {
+        const type = this.value;
+        const categorySelect = document.getElementById('category');
+        
+        // Clear existing options
+        categorySelect.innerHTML = '<option value="">Select Category</option>';
+        
+        // Get category data from hidden elements
+        let categories = [];
+        if (type === 'income') {
+            const incomeData = document.getElementById('income-categories').getAttribute('data-categories');
+            console.log('Income data:', incomeData);  // Debug line
+            if (incomeData) {
+                try {
+                    categories = JSON.parse(incomeData);
+                } catch (e) {
+                    console.error('Error parsing income categories:', e);
+                    categories = [];
+                }
+            }
+        } else if (type === 'expense') {
+            const expenseData = document.getElementById('expense-categories').getAttribute('data-categories');
+            console.log('Expense data:', expenseData);  // Debug line
+            if (expenseData) {
+                try {
+                    categories = JSON.parse(expenseData);
+                } catch (e) {
+                    console.error('Error parsing expense categories:', e);
+                    categories = [];
+                }
+            }
+        } else if (type === 'transfer') {
+            const transferData = document.getElementById('transfer-categories').getAttribute('data-categories');
+            console.log('Transfer data:', transferData);  // Debug line
+            if (transferData) {
+                try {
+                    categories = JSON.parse(transferData);
+                } catch (e) {
+                    console.error('Error parsing transfer categories:', e);
+                    categories = [];
+                }
+            }
+        }
+        
+        console.log('Selected categories:', categories);  // Debug line
+        
+        // Add categories to select
+        categories.forEach(function(category) {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category;
+            categorySelect.appendChild(option);
+        });
+        
+        // Show/hide relevant fields based on transaction type
+        document.getElementById('account_group').style.display = (type === 'income' || type === 'expense') ? 'block' : 'none';
+        document.getElementById('from_account_group').style.display = (type === 'transfer') ? 'block' : 'none';
+        document.getElementById('to_account_group').style.display = (type === 'transfer') ? 'block' : 'none';
+        document.getElementById('category_group').style.display = (type) ? 'block' : 'none';
+    });
+    
+    // Set today's date as default
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').value = today;
+    });
+</script>
+{% endblock %}

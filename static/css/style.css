@@ -1,0 +1,123 @@
+/* Custom styles for PaisaTrack */
+
+body {
+    background-color: #f8f9fa;
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+.footer {
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.balance-card {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: white;
+}
+
+.income-card {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+}
+
+.expense-card {
+    background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+    color: white;
+}
+
+.budget-card {
+    border-left: 4px solid #007bff;
+}
+
+.over-budget {
+    border-left: 4px solid #dc3545;
+    background-color: #fff5f5;
+}
+
+.near-budget {
+    border-left: 4px solid #ffc107;
+    background-color: #fff3cd;
+}
+
+.within-budget {
+    border-left: 4px solid #28a745;
+    background-color: #d4edda;
+}
+
+.transaction-item {
+    border-left: 3px solid #007bff;
+}
+
+.income-transaction {
+    border-left: 3px solid #28a745;
+}
+
+.expense-transaction {
+    border-left: 3px solid #dc3545;
+}
+
+.transfer-transaction {
+    border-left: 3px solid #6f42c1;
+}
+
+.account-card {
+    transition: transform 0.2s;
+}
+
+.account-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.currency-symbol {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.btn-action {
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+.progress {
+    height: 20px;
+}
+
+.progress-bar-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: 20px;
+    color: #000;
+    font-weight: bold;
+}
+
+.table th {
+    border-top: none;
+}
+
+.badge-status {
+    font-size: 0.75em;
+}
+
+.badge-active {
+    background-color: #28a745;
+}
+
+.badge-inactive {
+    background-color: #6c757d;
+}

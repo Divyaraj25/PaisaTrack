@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}Transactions - PaisaTrack{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Transactions</h1>
+    </div>
+</div>
+
+<!-- Account Balances Summary -->
+{% if accounts %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Current Account Balances</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    {% for account in accounts %}
+                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
+                        <div class="card h-100 border-primary border-2">
+                            <div class="card-body">
+                                <h6 class="card-title text-primary">{{ account.account_type }}</h6>
+                                {% if account.last_digits %}
+                                <p class="card-text text-muted mb-2">****{{ account.last_digits }}</p>
+                                {% endif %}
+                                <h5 class="card-text fw-bold">
+                                    {% if account.account_type == "Credit Card" %}
+                                        {% set current_balance = balances[account.account_type] %}
+                                        {% if current_balance < 0 %}
+                                            <span class="text-danger">-₹{{ "%.2f"|format(current_balance|abs) }}</span>
+                                        {% else %}
+                                            <span class="text-success">₹{{ "%.2f"|format(current_balance) }} (Credit)</span>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if balances[account.account_type] >= 0 %}
+                                            <span class="text-success">₹{{ "%.2f"|format(balances[account.account_type]) }}</span>
+                                        {% else %}
+                                            <span class="text-danger">-₹{{ "%.2f"|format(balances[account.account_type]|abs) }}</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row mb-3">
+    <div class="col-12">
+        <a href="{{ url_for('main.add_transaction') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Transaction
+        </a>
+        <button class="btn btn-outline-secondary" onclick="toggleFilters()">
+            <i class="bi bi-funnel"></i> Filter
+        </button>
+    </div>
+</div>
+
+<!-- Filter Section -->
+<div class="row mb-3" id="filter-section" style="display: none;">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Filter Transactions</h5>
+                <form method="GET">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="filter_type" class="form-label">Type</label>
+                            <select class="form-select" id="filter_type" name="type">
+                                <option value="">All Types</option>
+                                <option value="income" {% if request.args.get('type') == 'income' %}selected{% endif %}>Income</option>
+                                <option value="expense" {% if request.args.get('type') == 'expense' %}selected{% endif %}>Expense</option>
+                                <option value="transfer" {% if request.args.get('type') == 'transfer' %}selected{% endif %}>Transfer</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="filter_category" class="form-label">Category</label>
+                            <select class="form-select" id="filter_category" name="category">
+                                <option value="">All Categories</option>
+                                {% for category in categories.get('income', []) + categories.get('expense', []) + categories.get('transfer', []) %}
+                                <option value="{{ category }}" {% if request.args.get('category') == category %}selected{% endif %}>{{ category }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="filter_account" class="form-label">Account</label>
+                            <select class="form-select" id="filter_account" name="account">
+                                <option value="">All Accounts</option>
+                                {% for account in accounts %}
+                                <option value="{{ account.account_type }}" {% if request.args.get('account') == account.account_type %}selected{% endif %}>{{ account.account_type }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">Apply</button>
+                            <a href="{{ url_for('main.transactions') }}" class="btn btn-secondary">Clear</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        {% if transactions %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Account</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                    <tr class="transaction-item {{ transaction.type }}-transaction">
+                        <td>{{ transaction.date }}</td>
+                        <td>
+                            <span class="badge bg-{% if transaction.type == 'income' %}success{% elif transaction.type == 'expense' %}danger{% else %}info{% endif %}">
+                                {{ transaction.type|title }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if transaction.type == 'transfer' %}
+                                {{ transaction.from_account }} → {{ transaction.to_account }}
+                            {% else %}
+                                {{ transaction.account }}
+                            {% endif %}
+                        </td>
+                        <td>{{ transaction.category }}</td>
+                        <td>{{ transaction.description or '-' }}</td>
+                        <td>
+                            {% if transaction.type == 'income' %}
+                                <span class="text-success">+₹{{ "%.2f"|format(transaction.amount) }}</span>
+                            {% elif transaction.type == 'expense' %}
+                                <span class="text-danger">-₹{{ "%.2f"|format(transaction.amount) }}</span>
+                            {% else %}
+                                <span class="text-info">₹{{ "%.2f"|format(transaction.amount) }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if total_pages > 1 %}
+        <nav aria-label="Transactions pagination">
+            <ul class="pagination justify-content-center">
+                <!-- Previous button -->
+                {% if current_page > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('main.transactions', page=current_page-1, type=transaction_type, category=category, account=account) }}">Previous</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Previous</span>
+                </li>
+                {% endif %}
+                
+                <!-- Page numbers -->
+                {% for page_num in range(1, total_pages + 1) %}
+                    {% if page_num == current_page %}
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link">{{ page_num }}</span>
+                    </li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('main.transactions', page=page_num, type=transaction_type, category=category, account=account) }}">{{ page_num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                
+                <!-- Next button -->
+                {% if current_page < total_pages %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('main.transactions', page=current_page+1, type=transaction_type, category=category, account=account) }}">Next</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Next</span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        <div class="text-center text-muted">
+            Showing {{ transactions|length }} of {{ total_transactions }} transactions
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div class="alert alert-info">
+            <p>No transactions found.</p>
+            <a href="{{ url_for('main.add_transaction') }}" class="btn btn-primary">Add your first transaction</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Apply filters from URL parameters
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('type') || urlParams.has('category') || urlParams.has('account')) {
+            document.getElementById('filter-section').style.display = 'block';
+        }
+    });
+    
+    // Toggle filter section
+    function toggleFilters() {
+        const filterSection = document.getElementById('filter-section');
+        filterSection.style.display = filterSection.style.display === 'none' ? 'block' : 'none';
+    }
+</script>
+{% endblock %}
