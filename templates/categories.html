@@ -5,7 +5,7 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <h1 class="mb-4">Categories</h1>
+        <h1 class="mb-4"><i class="bi bi-tags"></i> Categories</h1>
     </div>
 </div>
 
@@ -20,14 +20,14 @@
 <div class="row">
     <div class="col-md-4">
         <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Income Categories</h5>
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-arrow-down"></i> Income Categories</h5>
             </div>
             <div class="card-body">
                 {% if categories.income %}
                 <ul class="list-group list-group-flush">
                     {% for category in categories.income %}
-                    <li class="list-group-item">{{ category }}</li>
+                    <li class="list-group-item"><i class="bi bi-tag text-success"></i> {{ category }}</li>
                     {% endfor %}
                 </ul>
                 {% else %}
@@ -39,14 +39,14 @@
     
     <div class="col-md-4">
         <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Expense Categories</h5>
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-arrow-up"></i> Expense Categories</h5>
             </div>
             <div class="card-body">
                 {% if categories.expense %}
                 <ul class="list-group list-group-flush">
                     {% for category in categories.expense %}
-                    <li class="list-group-item">{{ category }}</li>
+                    <li class="list-group-item"><i class="bi bi-tag text-danger"></i> {{ category }}</li>
                     {% endfor %}
                 </ul>
                 {% else %}
@@ -58,14 +58,14 @@
     
     <div class="col-md-4">
         <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Transfer Categories</h5>
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-arrow-left-right"></i> Transfer Categories</h5>
             </div>
             <div class="card-body">
                 {% if categories.transfer %}
                 <ul class="list-group list-group-flush">
                     {% for category in categories.transfer %}
-                    <li class="list-group-item">{{ category }}</li>
+                    <li class="list-group-item"><i class="bi bi-tag text-info"></i> {{ category }}</li>
                     {% endfor %}
                 </ul>
                 {% else %}

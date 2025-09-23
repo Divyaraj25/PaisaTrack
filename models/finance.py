@@ -161,10 +161,12 @@ class FinanceModel:
         
         # Return default categories if none exist or error occurred
         return {
-            "income": ["Salary", "Freelance", "Investment", "Gift", "Business", "Other"],
+            "income": ["Salary", "Freelance", "Investment", "Gift", "Business", "Bonus", "Dividend", "Rental Income", "Other"],
             "expense": ["Food", "Transport", "Entertainment", "Utilities", "Rent", "Healthcare", 
-                       "Education", "Shopping", "Travel", "Personal Care", "Other"],
-            "transfer": ["Cash to Bank", "Bank to Card", "Card to Cash", "Between Accounts", "Credit Card Payment"]
+                       "Education", "Shopping", "Travel", "Personal Care", "Insurance", "Taxes", 
+                       "Subscriptions", "Maintenance", "Charity", "Other"],
+            "transfer": ["Cash to Bank", "Bank to Card", "Card to Cash", "Between Accounts", 
+                        "Credit Card Payment", "Bank Transfer", "Investment Transfer", "Loan Payment"]
         }
     
     def update_categories(self, categories_data):
@@ -229,6 +231,180 @@ class FinanceModel:
                     "period": "monthly",
                     "start_date": "2023-11-01",
                     "end_date": "2023-11-30"
+                },
+                "comprehensive_example": {
+                    "scenario": "Monthly Financial Management",
+                    "description": "A real-world example showing how to manage personal finances for a month with multiple accounts, income sources, and expenses",
+                    "accounts": [
+                        {
+                            "type": "Bank Account",
+                            "initial_amount": 100000,
+                            "description": "Primary savings account with initial balance"
+                        },
+                        {
+                            "type": "Credit Card",
+                            "initial_amount": -25000,
+                            "description": "Credit card with existing debt (negative balance)"
+                        },
+                        {
+                            "type": "Cash",
+                            "initial_amount": 5000,
+                            "description": "Physical cash on hand"
+                        },
+                        {
+                            "type": "Investment Account",
+                            "initial_amount": 200000,
+                            "description": "Long-term investment portfolio"
+                        }
+                    ],
+                    "transactions": [
+                        {
+                            "type": "income",
+                            "account": "Bank Account",
+                            "category": "Salary",
+                            "amount": 75000,
+                            "date": "2023-11-01",
+                            "description": "Monthly salary deposit"
+                        },
+                        {
+                            "type": "income",
+                            "account": "Bank Account",
+                            "category": "Investment",
+                            "amount": 5000,
+                            "date": "2023-11-02",
+                            "description": "Dividend income from stocks"
+                        },
+                        {
+                            "type": "expense",
+                            "account": "Credit Card",
+                            "category": "Rent",
+                            "amount": 25000,
+                            "date": "2023-11-02",
+                            "description": "Monthly rent payment"
+                        },
+                        {
+                            "type": "transfer",
+                            "from_account": "Bank Account",
+                            "to_account": "Credit Card",
+                            "category": "Credit Card Payment",
+                            "amount": 25000,
+                            "date": "2023-11-03",
+                            "description": "Credit card bill payment"
+                        },
+                        {
+                            "type": "expense",
+                            "account": "Cash",
+                            "category": "Food",
+                            "amount": 3000,
+                            "date": "2023-11-05",
+                            "description": "Weekly grocery shopping"
+                        },
+                        {
+                            "type": "transfer",
+                            "from_account": "Bank Account",
+                            "to_account": "Cash",
+                            "category": "Cash Withdrawal",
+                            "amount": 5000,
+                            "date": "2023-11-06",
+                            "description": "ATM cash withdrawal"
+                        },
+                        {
+                            "type": "expense",
+                            "account": "Credit Card",
+                            "category": "Utilities",
+                            "amount": 2500,
+                            "date": "2023-11-07",
+                            "description": "Electricity and water bills"
+                        },
+                        {
+                            "type": "expense",
+                            "account": "Bank Account",
+                            "category": "Insurance",
+                            "amount": 8000,
+                            "date": "2023-11-10",
+                            "description": "Annual health insurance premium"
+                        },
+                        {
+                            "type": "transfer",
+                            "from_account": "Bank Account",
+                            "to_account": "Investment Account",
+                            "category": "Investment Transfer",
+                            "amount": 15000,
+                            "date": "2023-11-15",
+                            "description": "Monthly investment contribution"
+                        },
+                        {
+                            "type": "expense",
+                            "account": "Credit Card",
+                            "category": "Entertainment",
+                            "amount": 3500,
+                            "date": "2023-11-20",
+                            "description": "Movie tickets and dinner"
+                        },
+                        {
+                            "type": "expense",
+                            "account": "Bank Account",
+                            "category": "Shopping",
+                            "amount": 12000,
+                            "date": "2023-11-22",
+                            "description": "Clothing and household items"
+                        },
+                        {
+                            "type": "transfer",
+                            "from_account": "Investment Account",
+                            "to_account": "Bank Account",
+                            "category": "Investment Transfer",
+                            "amount": 10000,
+                            "date": "2023-11-25",
+                            "description": "Withdrawal for emergency fund"
+                        }
+                    ],
+                    "budgets": [
+                        {
+                            "category": "Food",
+                            "amount": 12000,
+                            "period": "monthly",
+                            "start_date": "2023-11-01",
+                            "end_date": "2023-11-30",
+                            "description": "Monthly food budget including groceries and dining out"
+                        },
+                        {
+                            "category": "Entertainment",
+                            "amount": 5000,
+                            "period": "monthly",
+                            "start_date": "2023-11-01",
+                            "end_date": "2023-11-30",
+                            "description": "Monthly entertainment budget for movies, events, etc."
+                        },
+                        {
+                            "category": "Shopping",
+                            "amount": 10000,
+                            "period": "monthly",
+                            "start_date": "2023-11-01",
+                            "end_date": "2023-11-30",
+                            "description": "Monthly shopping budget for clothing and household items"
+                        },
+                        {
+                            "category": "Utilities",
+                            "amount": 3000,
+                            "period": "monthly",
+                            "start_date": "2023-11-01",
+                            "end_date": "2023-11-30",
+                            "description": "Monthly utilities budget for electricity, water, internet, etc."
+                        }
+                    ],
+                    "financial_summary": {
+                        "total_income": 80000,
+                        "total_expenses": 56000,
+                        "net_savings": 24000,
+                        "account_balances": {
+                            "Bank Account": 147000,
+                            "Credit Card": 0,
+                            "Cash": 2000,
+                            "Investment Account": 205000
+                        },
+                        "net_worth": 354000
+                    }
                 }
             },
             "tips": [
@@ -269,10 +445,12 @@ class FinanceModel:
             # Check if categories exist
             if not self.categories_collection.find_one():
                 default_categories = {
-                    "income": ["Salary", "Freelance", "Investment", "Gift", "Business", "Other"],
+                    "income": ["Salary", "Freelance", "Investment", "Gift", "Business", "Bonus", "Dividend", "Rental Income", "Other"],
                     "expense": ["Food", "Transport", "Entertainment", "Utilities", "Rent", "Healthcare", 
-                               "Education", "Shopping", "Travel", "Personal Care", "Other"],
-                    "transfer": ["Cash to Bank", "Bank to Card", "Card to Cash", "Between Accounts", "Credit Card Payment"]
+                               "Education", "Shopping", "Travel", "Personal Care", "Insurance", "Taxes", 
+                               "Subscriptions", "Maintenance", "Charity", "Other"],
+                    "transfer": ["Cash to Bank", "Bank to Card", "Card to Cash", "Between Accounts", 
+                                "Credit Card Payment", "Bank Transfer", "Investment Transfer", "Loan Payment"]
                 }
                 self.categories_collection.insert_one(default_categories)
             
@@ -313,6 +491,180 @@ class FinanceModel:
                             "period": "monthly",
                             "start_date": "2023-11-01",
                             "end_date": "2023-11-30"
+                        },
+                        "comprehensive_example": {
+                            "scenario": "Monthly Financial Management",
+                            "description": "A real-world example showing how to manage personal finances for a month with multiple accounts, income sources, and expenses",
+                            "accounts": [
+                                {
+                                    "type": "Bank Account",
+                                    "initial_amount": 100000,
+                                    "description": "Primary savings account with initial balance"
+                                },
+                                {
+                                    "type": "Credit Card",
+                                    "initial_amount": -25000,
+                                    "description": "Credit card with existing debt (negative balance)"
+                                },
+                                {
+                                    "type": "Cash",
+                                    "initial_amount": 5000,
+                                    "description": "Physical cash on hand"
+                                },
+                                {
+                                    "type": "Investment Account",
+                                    "initial_amount": 200000,
+                                    "description": "Long-term investment portfolio"
+                                }
+                            ],
+                            "transactions": [
+                                {
+                                    "type": "income",
+                                    "account": "Bank Account",
+                                    "category": "Salary",
+                                    "amount": 75000,
+                                    "date": "2023-11-01",
+                                    "description": "Monthly salary deposit"
+                                },
+                                {
+                                    "type": "income",
+                                    "account": "Bank Account",
+                                    "category": "Investment",
+                                    "amount": 5000,
+                                    "date": "2023-11-02",
+                                    "description": "Dividend income from stocks"
+                                },
+                                {
+                                    "type": "expense",
+                                    "account": "Credit Card",
+                                    "category": "Rent",
+                                    "amount": 25000,
+                                    "date": "2023-11-02",
+                                    "description": "Monthly rent payment"
+                                },
+                                {
+                                    "type": "transfer",
+                                    "from_account": "Bank Account",
+                                    "to_account": "Credit Card",
+                                    "category": "Credit Card Payment",
+                                    "amount": 25000,
+                                    "date": "2023-11-03",
+                                    "description": "Credit card bill payment"
+                                },
+                                {
+                                    "type": "expense",
+                                    "account": "Cash",
+                                    "category": "Food",
+                                    "amount": 3000,
+                                    "date": "2023-11-05",
+                                    "description": "Weekly grocery shopping"
+                                },
+                                {
+                                    "type": "transfer",
+                                    "from_account": "Bank Account",
+                                    "to_account": "Cash",
+                                    "category": "Cash Withdrawal",
+                                    "amount": 5000,
+                                    "date": "2023-11-06",
+                                    "description": "ATM cash withdrawal"
+                                },
+                                {
+                                    "type": "expense",
+                                    "account": "Credit Card",
+                                    "category": "Utilities",
+                                    "amount": 2500,
+                                    "date": "2023-11-07",
+                                    "description": "Electricity and water bills"
+                                },
+                                {
+                                    "type": "expense",
+                                    "account": "Bank Account",
+                                    "category": "Insurance",
+                                    "amount": 8000,
+                                    "date": "2023-11-10",
+                                    "description": "Annual health insurance premium"
+                                },
+                                {
+                                    "type": "transfer",
+                                    "from_account": "Bank Account",
+                                    "to_account": "Investment Account",
+                                    "category": "Investment Transfer",
+                                    "amount": 15000,
+                                    "date": "2023-11-15",
+                                    "description": "Monthly investment contribution"
+                                },
+                                {
+                                    "type": "expense",
+                                    "account": "Credit Card",
+                                    "category": "Entertainment",
+                                    "amount": 3500,
+                                    "date": "2023-11-20",
+                                    "description": "Movie tickets and dinner"
+                                },
+                                {
+                                    "type": "expense",
+                                    "account": "Bank Account",
+                                    "category": "Shopping",
+                                    "amount": 12000,
+                                    "date": "2023-11-22",
+                                    "description": "Clothing and household items"
+                                },
+                                {
+                                    "type": "transfer",
+                                    "from_account": "Investment Account",
+                                    "to_account": "Bank Account",
+                                    "category": "Investment Transfer",
+                                    "amount": 10000,
+                                    "date": "2023-11-25",
+                                    "description": "Withdrawal for emergency fund"
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "category": "Food",
+                                    "amount": 12000,
+                                    "period": "monthly",
+                                    "start_date": "2023-11-01",
+                                    "end_date": "2023-11-30",
+                                    "description": "Monthly food budget including groceries and dining out"
+                                },
+                                {
+                                    "category": "Entertainment",
+                                    "amount": 5000,
+                                    "period": "monthly",
+                                    "start_date": "2023-11-01",
+                                    "end_date": "2023-11-30",
+                                    "description": "Monthly entertainment budget for movies, events, etc."
+                                },
+                                {
+                                    "category": "Shopping",
+                                    "amount": 10000,
+                                    "period": "monthly",
+                                    "start_date": "2023-11-01",
+                                    "end_date": "2023-11-30",
+                                    "description": "Monthly shopping budget for clothing and household items"
+                                },
+                                {
+                                    "category": "Utilities",
+                                    "amount": 3000,
+                                    "period": "monthly",
+                                    "start_date": "2023-11-01",
+                                    "end_date": "2023-11-30",
+                                    "description": "Monthly utilities budget for electricity, water, internet, etc."
+                                }
+                            ],
+                            "financial_summary": {
+                                "total_income": 80000,
+                                "total_expenses": 56000,
+                                "net_savings": 24000,
+                                "account_balances": {
+                                    "Bank Account": 147000,
+                                    "Credit Card": 0,
+                                    "Cash": 2000,
+                                    "Investment Account": 205000
+                                },
+                                "net_worth": 354000
+                            }
                         }
                     },
                     "tips": [

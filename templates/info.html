@@ -4,8 +4,10 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-12">
-        <h1 class="mb-4">Finance Tracker Information</h1>
+    <div class="col-12 text-center mb-4">
+        <img src="{{ url_for('static', filename='images/rupee.png') }}" alt="PaisaTrack Logo" class="img-fluid project-icon mb-3">
+        <h1><i class="bi bi-info-circle"></i> Finance Tracker Information</h1>
+        <p class="lead">Learn more about how to use PaisaTrack effectively</p>
     </div>
 </div>
 
@@ -13,18 +15,18 @@
     <div class="col-12">
         <div class="card mb-4">
             <div class="card-body">
-                <h2 class="card-title">Introduction</h2>
+                <h2 class="card-title"><i class="bi bi-book"></i> Introduction</h2>
                 <p>{{ info.introduction }}</p>
             </div>
         </div>
         
         <div class="card mb-4">
             <div class="card-body">
-                <h2 class="card-title">Features</h2>
+                <h2 class="card-title"><i class="bi bi-stars"></i> Features</h2>
                 <div class="row">
                     {% for feature, description in info.features.items() %}
                     <div class="col-md-6 mb-3">
-                        <h5>{{ feature.replace('_', ' ').title() }}</h5>
+                        <h5><i class="bi bi-check-circle text-success"></i> {{ feature.replace('_', ' ').title() }}</h5>
                         <p>{{ description }}</p>
                     </div>
                     {% endfor %}
@@ -34,11 +36,11 @@
         
         <div class="card mb-4">
             <div class="card-body">
-                <h2 class="card-title">Calculations</h2>
+                <h2 class="card-title"><i class="bi bi-calculator"></i> Calculations</h2>
                 <div class="row">
                     {% for calc, formula in info.calculations.items() %}
                     <div class="col-md-4 mb-3">
-                        <h5>{{ calc.replace('_', ' ').title() }}</h5>
+                        <h5><i class="bi bi-math"></i> {{ calc.replace('_', ' ').title() }}</h5>
                         <p>{{ formula }}</p>
                     </div>
                     {% endfor %}
@@ -48,11 +50,133 @@
         
         <div class="card mb-4">
             <div class="card-body">
-                <h2 class="card-title">Examples</h2>
+                <h2 class="card-title"><i class="bi bi-lightbulb"></i> Examples</h2>
                 <div class="row">
                     {% for example_type, example in info.examples.items() %}
+                    {% if example_type == "comprehensive_example" %}
+                    <div class="col-12 mb-4">
+                        <div class="card border-primary">
+                            <div class="card-header bg-primary text-white">
+                                <h3 class="card-title mb-0"><i class="bi bi-globe"></i> {{ example.scenario }}</h3>
+                            </div>
+                            <div class="card-body">
+                                <p class="lead">{{ example.description }}</p>
+                                
+                                <h4><i class="bi bi-wallet2"></i> Accounts Setup</h4>
+                                <div class="row mb-4">
+                                    {% for account in example.accounts %}
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <h5 class="card-title">{{ account.type }}</h5>
+                                                <p class="card-text">Initial Amount: ₹{{ account.initial_amount }}</p>
+                                                <p class="card-text">{{ account.description }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <h4><i class="bi bi-arrow-left-right"></i> Sample Transactions</h4>
+                                <div class="table-responsive mb-4">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Type</th>
+                                                <th>Account(s)</th>
+                                                <th>Category</th>
+                                                <th>Amount</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for transaction in example.transactions %}
+                                            <tr>
+                                                <td>{{ transaction.date }}</td>
+                                                <td>{{ transaction.type.title() }}</td>
+                                                <td>
+                                                    {% if transaction.type == "transfer" %}
+                                                        {{ transaction.from_account }} → {{ transaction.to_account }}
+                                                    {% else %}
+                                                        {{ transaction.account }}
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ transaction.category }}</td>
+                                                <td>₹{{ transaction.amount }}</td>
+                                                <td>{{ transaction.description }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <h4><i class="bi bi-piggy-bank"></i> Budget Planning</h4>
+                                <div class="row mb-4">
+                                    {% for budget in example.budgets %}
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <h5 class="card-title">{{ budget.category }}</h5>
+                                                <p class="card-text">Amount: ₹{{ budget.amount }}</p>
+                                                <p class="card-text">Period: {{ budget.period.title() }}</p>
+                                                <p class="card-text">Duration: {{ budget.start_date }} to {{ budget.end_date }}</p>
+                                                <p class="card-text">{{ budget.description }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <h4><i class="bi bi-graph-up"></i> Financial Summary</h4>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card h-100 bg-light">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Income & Expenses</h5>
+                                                <ul class="list-group list-group-flush">
+                                                    <li class="list-group-item d-flex justify-content-between">
+                                                        <span>Total Income:</span>
+                                                        <strong>₹{{ example.financial_summary.total_income }}</strong>
+                                                    </li>
+                                                    <li class="list-group-item d-flex justify-content-between">
+                                                        <span>Total Expenses:</span>
+                                                        <strong>₹{{ example.financial_summary.total_expenses }}</strong>
+                                                    </li>
+                                                    <li class="list-group-item d-flex justify-content-between bg-success text-white">
+                                                        <span>Net Savings:</span>
+                                                        <strong>₹{{ example.financial_summary.net_savings }}</strong>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card h-100 bg-light">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Account Balances</h5>
+                                                <ul class="list-group list-group-flush">
+                                                    {% for account, balance in example.financial_summary.account_balances.items() %}
+                                                    <li class="list-group-item d-flex justify-content-between">
+                                                        <span>{{ account }}:</span>
+                                                        <strong>₹{{ balance }}</strong>
+                                                    </li>
+                                                    {% endfor %}
+                                                    <li class="list-group-item d-flex justify-content-between bg-primary text-white">
+                                                        <span>Net Worth:</span>
+                                                        <strong>₹{{ example.financial_summary.net_worth }}</strong>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
                     <div class="col-md-4 mb-3">
-                        <h5>{{ example_type.replace('_', ' ').title() }}</h5>
+                        <h5><i class="bi bi-code-square"></i> {{ example_type.replace('_', ' ').title() }}</h5>
                         <ul class="list-group">
                             {% for key, value in example.items() %}
                             <li class="list-group-item">
@@ -61,6 +185,7 @@
                             {% endfor %}
                         </ul>
                     </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>
@@ -68,10 +193,10 @@
         
         <div class="card mb-4">
             <div class="card-body">
-                <h2 class="card-title">Tips</h2>
+                <h2 class="card-title"><i class="bi bi-hand-thumbs-up"></i> Tips</h2>
                 <ol>
                     {% for tip in info.tips %}
-                    <li class="mb-2">{{ tip }}</li>
+                    <li class="mb-2"><i class="bi bi-lightning text-warning"></i> {{ tip }}</li>
                     {% endfor %}
                 </ol>
             </div>
@@ -79,11 +204,11 @@
         
         <div class="card mb-4">
             <div class="card-body">
-                <h2 class="card-title">How to Use</h2>
+                <h2 class="card-title"><i class="bi bi-question-circle"></i> How to Use</h2>
                 <div class="row">
                     {% for section, instructions in info.how_to_use.items() %}
                     <div class="col-md-6 mb-3">
-                        <h5>{{ section.replace('_', ' ').title() }}</h5>
+                        <h5><i class="bi bi-gear"></i> {{ section.replace('_', ' ').title() }}</h5>
                         <p>{{ instructions }}</p>
                     </div>
                     {% endfor %}

@@ -5,7 +5,7 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <h1 class="mb-4">Accounts</h1>
+        <h1 class="mb-4"><i class="bi bi-wallet2"></i> Accounts</h1>
     </div>
 </div>
 
@@ -22,23 +22,37 @@
         {% if accounts %}
         <div class="row">
             {% for account in accounts %}
-            <div class="col-md-6 col-lg-4 mb-3">
-                <div class="card account-card">
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-3">
+                <div class="card account-card h-100">
                     <div class="card-body">
-                        <h5 class="card-title">
-                            {{ account.account_type }}
-                            {% if account.last_digits %}<small class="text-muted">(****{{ account.last_digits }})</small>{% endif %}
-                        </h5>
-                        <p class="card-text">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h5 class="card-title">
+                                {% if account.account_type == "Savings Account" %}
+                                    <i class="bi bi-bank"></i>
+                                {% elif account.account_type == "Checking Account" %}
+                                    <i class="bi bi-wallet"></i>
+                                {% elif account.account_type == "Credit Card" %}
+                                    <i class="bi bi-credit-card"></i>
+                                {% elif account.account_type == "Investment Account" %}
+                                    <i class="bi bi-graph-up"></i>
+                                {% else %}
+                                    <i class="bi bi-wallet2"></i>
+                                {% endif %}
+                                {{ account.account_type }}
+                                {% if account.last_digits %}<small class="text-muted">(****{{ account.last_digits }})</small>{% endif %}
+                            </h5>
+                            <span class="badge bg-primary">Active</span>
+                        </div>
+                        <p class="card-text mt-3">
                             <strong>Balance:</strong> 
                             {% if account.account_type == "Credit Card" %}
-                                -₹{{ "%.2f"|format(account.initial_amount|abs) }}
+                                <span class="text-danger">-₹{{ "%.2f"|format(account.initial_amount|abs) }}</span>
                             {% else %}
-                                ₹{{ "%.2f"|format(account.initial_amount) }}
+                                <span class="text-success">₹{{ "%.2f"|format(account.initial_amount) }}</span>
                             {% endif %}
                         </p>
                         <p class="card-text">
-                            <small class="text-muted">Created: {{ account.created_date }}</small>
+                            <small class="text-muted"><i class="bi bi-calendar"></i> Created: {{ account.created_date }}</small>
                         </p>
                         <!--
                         <a href="#" class="btn btn-sm btn-outline-primary">Edit</a>
@@ -50,8 +64,10 @@
             {% endfor %}
         </div>
         {% else %}
-        <div class="alert alert-info">
-            <p>No accounts found.</p>
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle" style="font-size: 2rem;"></i>
+            <h4 class="mt-3">No accounts found</h4>
+            <p>Get started by adding your first account.</p>
             <a href="{{ url_for('main.add_account') }}" class="btn btn-primary">Add your first account</a>
         </div>
         {% endif %}

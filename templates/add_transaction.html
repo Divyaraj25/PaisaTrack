@@ -5,7 +5,7 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <h1 class="mb-4">Add Transaction</h1>
+        <h1 class="mb-4"><i class="bi bi-plus-circle"></i> Add Transaction</h1>
     </div>
 </div>
 
@@ -15,15 +15,28 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">Current Account Balances</h5>
+                <h5 class="mb-0"><i class="bi bi-bank"></i> Current Account Balances</h5>
             </div>
             <div class="card-body">
                 <div class="row g-3">
                     {% for account in accounts %}
                     <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
-                        <div class="card h-100 border-primary border-2">
+                        <div class="card h-100 border-primary border-2 account-card">
                             <div class="card-body">
-                                <h6 class="card-title text-primary">{{ account.account_type }}</h6>
+                                <h6 class="card-title text-primary">
+                                    {% if account.account_type == "Savings Account" %}
+                                        <i class="bi bi-bank"></i>
+                                    {% elif account.account_type == "Checking Account" %}
+                                        <i class="bi bi-wallet"></i>
+                                    {% elif account.account_type == "Credit Card" %}
+                                        <i class="bi bi-credit-card"></i>
+                                    {% elif account.account_type == "Investment Account" %}
+                                        <i class="bi bi-graph-up"></i>
+                                    {% else %}
+                                        <i class="bi bi-wallet2"></i>
+                                    {% endif %}
+                                    {{ account.account_type }}
+                                </h6>
                                 {% if account.last_digits %}
                                 <p class="card-text text-muted mb-2">****{{ account.last_digits }}</p>
                                 {% endif %}
@@ -141,22 +154,22 @@
 </script>
 
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-lg-8 col-md-12">
         <div class="card">
             <div class="card-body">
                 <form method="POST">
                     <div class="mb-3">
-                        <label for="transaction_type" class="form-label">Transaction Type</label>
+                        <label for="transaction_type" class="form-label"><i class="bi bi-tag"></i> Transaction Type</label>
                         <select class="form-select" id="transaction_type" name="transaction_type" required>
                             <option value="">Select Transaction Type</option>
-                            <option value="income">Income</option>
-                            <option value="expense">Expense</option>
-                            <option value="transfer">Transfer</option>
+                            <option value="income"><i class="bi bi-arrow-down"></i> Income</option>
+                            <option value="expense"><i class="bi bi-arrow-up"></i> Expense</option>
+                            <option value="transfer"><i class="bi bi-arrow-left-right"></i> Transfer</option>
                         </select>
                     </div>
                     
                     <div class="mb-3" id="account_group" style="display: none;">
-                        <label for="account" class="form-label">Account</label>
+                        <label for="account" class="form-label"><i class="bi bi-wallet"></i> Account</label>
                         <select class="form-select" id="account" name="account">
                             <option value="">Select Account</option>
                             {% for account in accounts %}
@@ -171,7 +184,7 @@
                     </div>
                     
                     <div class="mb-3" id="from_account_group" style="display: none;">
-                        <label for="from_account" class="form-label">From Account</label>
+                        <label for="from_account" class="form-label"><i class="bi bi-box-arrow-left"></i> From Account</label>
                         <select class="form-select" id="from_account" name="from_account">
                             <option value="">Select Account</option>
                             {% for account in accounts %}
@@ -181,7 +194,7 @@
                     </div>
                     
                     <div class="mb-3" id="to_account_group" style="display: none;">
-                        <label for="to_account" class="form-label">To Account</label>
+                        <label for="to_account" class="form-label"><i class="bi bi-box-arrow-right"></i> To Account</label>
                         <select class="form-select" id="to_account" name="to_account">
                             <option value="">Select Account</option>
                             {% for account in accounts %}
@@ -191,14 +204,14 @@
                     </div>
                     
                     <div class="mb-3" id="category_group" style="display: none;">
-                        <label for="category" class="form-label">Category</label>
+                        <label for="category" class="form-label"><i class="bi bi-tags"></i> Category</label>
                         <select class="form-select" id="category" name="category" required>
                             <option value="">Select Category</option>
                         </select>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="amount" class="form-label">Amount</label>
+                        <label for="amount" class="form-label"><i class="bi bi-currency-rupee"></i> Amount</label>
                         <div class="input-group">
                             <span class="input-group-text">₹</span>
                             <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0.01" required>
@@ -206,36 +219,36 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="date" class="form-label">Date</label>
+                        <label for="date" class="form-label"><i class="bi bi-calendar"></i> Date</label>
                         <input type="date" class="form-control" id="date" name="date" required>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="description" class="form-label">Description (Optional)</label>
-                        <textarea class="form-control" id="description" name="description" rows="2"></textarea>
+                        <label for="description" class="form-label"><i class="bi bi-card-text"></i> Description (Optional)</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
                     </div>
                     
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-plus-circle"></i> Add Transaction
                     </button>
-                    <a href="{{ url_for('main.transactions') }}" class="btn btn-secondary">Cancel</a>
+                    <a href="{{ url_for('main.transactions') }}" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Cancel</a>
                 </form>
             </div>
         </div>
     </div>
     
-    <div class="col-md-4">
-        <div class="card">
+    <div class="col-lg-4 col-md-12">
+        <div class="card mb-3">
             <div class="card-body">
-                <h5 class="card-title">Transaction Types</h5>
-                <ul>
-                    <li><strong>Income:</strong> Money received (salary, gifts, etc.)</li>
-                    <li><strong>Expense:</strong> Money spent (food, rent, etc.)</li>
-                    <li><strong>Transfer:</strong> Money moved between accounts</li>
+                <h5 class="card-title"><i class="bi bi-info-circle"></i> Transaction Types</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><i class="bi bi-arrow-down text-success"></i> <strong>Income:</strong> Money received (salary, gifts, etc.)</li>
+                    <li class="list-group-item"><i class="bi bi-arrow-up text-danger"></i> <strong>Expense:</strong> Money spent (food, rent, etc.)</li>
+                    <li class="list-group-item"><i class="bi bi-arrow-left-right text-info"></i> <strong>Transfer:</strong> Money moved between accounts</li>
                 </ul>
-                <p class="text-muted">
+                <div class="alert alert-info mt-3">
                     <i class="bi bi-info-circle"></i> Note: Credit Cards cannot receive income directly.
-                </p>
+                </div>
             </div>
         </div>
         

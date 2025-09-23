@@ -5,7 +5,7 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <h1 class="mb-4">Set Budget</h1>
+        <h1 class="mb-4"><i class="bi bi-piggy-bank"></i> Set Budget</h1>
     </div>
 </div>
 
@@ -15,7 +15,7 @@
             <div class="card-body">
                 <form method="POST">
                     <div class="mb-3">
-                        <label for="category" class="form-label">Category</label>
+                        <label for="category" class="form-label"><i class="bi bi-tags"></i> Category</label>
                         <select class="form-select" id="category" name="category" required>
                             <option value="">Select Expense Category</option>
                             {% for category in categories.expense %}
@@ -25,7 +25,7 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="amount" class="form-label">Budget Amount</label>
+                        <label for="amount" class="form-label"><i class="bi bi-currency-rupee"></i> Budget Amount</label>
                         <div class="input-group">
                             <span class="input-group-text">₹</span>
                             <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0.01" required>
@@ -33,24 +33,24 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="period" class="form-label">Budget Period</label>
+                        <label for="period" class="form-label"><i class="bi bi-calendar"></i> Budget Period</label>
                         <select class="form-select" id="period" name="period" required>
                             <option value="">Select Period</option>
-                            <option value="custom">Custom Dates</option>
-                            <option value="weekly">Weekly (Monday to Sunday)</option>
-                            <option value="monthly">Monthly (1st to last day of month)</option>
-                            <option value="yearly">Yearly (Jan 1st to Dec 31st)</option>
+                            <option value="custom"><i class="bi bi-calendar-range"></i> Custom Dates</option>
+                            <option value="weekly"><i class="bi bi-calendar-week"></i> Weekly (Monday to Sunday)</option>
+                            <option value="monthly"><i class="bi bi-calendar-month"></i> Monthly (1st to last day of month)</option>
+                            <option value="yearly"><i class="bi bi-calendar-check"></i> Yearly (Jan 1st to Dec 31st)</option>
                         </select>
                     </div>
                     
                     <div class="mb-3" id="date_range" style="display: none;">
                         <div class="row">
                             <div class="col-md-6">
-                                <label for="start_date" class="form-label">Start Date</label>
+                                <label for="start_date" class="form-label"><i class="bi bi-calendar"></i> Start Date</label>
                                 <input type="date" class="form-control" id="start_date" name="start_date">
                             </div>
                             <div class="col-md-6">
-                                <label for="end_date" class="form-label">End Date</label>
+                                <label for="end_date" class="form-label"><i class="bi bi-calendar"></i> End Date</label>
                                 <input type="date" class="form-control" id="end_date" name="end_date">
                             </div>
                         </div>
@@ -59,7 +59,7 @@
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-piggy-bank"></i> Set Budget
                     </button>
-                    <a href="{{ url_for('main.budgets') }}" class="btn btn-secondary">Cancel</a>
+                    <a href="{{ url_for('main.budgets') }}" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Cancel</a>
                 </form>
             </div>
         </div>
@@ -68,23 +68,23 @@
     <div class="col-md-4">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Budget Tips</h5>
-                <ul>
-                    <li>Set realistic budgets based on your historical spending</li>
-                    <li>Review and adjust budgets regularly</li>
-                    <li>Use custom dates for special occasions or events</li>
-                    <li>Set monthly budgets for regular expenses like rent and utilities</li>
+                <h5 class="card-title"><i class="bi bi-lightbulb"></i> Budget Tips</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><i class="bi bi-check-circle text-success"></i> Set realistic budgets based on your historical spending</li>
+                    <li class="list-group-item"><i class="bi bi-arrow-repeat text-primary"></i> Review and adjust budgets regularly</li>
+                    <li class="list-group-item"><i class="bi bi-calendar-range text-info"></i> Use custom dates for special occasions or events</li>
+                    <li class="list-group-item"><i class="bi bi-calendar-month text-warning"></i> Set monthly budgets for regular expenses like rent and utilities</li>
                 </ul>
             </div>
         </div>
         
         <div class="card mt-3">
             <div class="card-body">
-                <h5 class="card-title">Expense Categories</h5>
+                <h5 class="card-title"><i class="bi bi-tags"></i> Expense Categories</h5>
                 {% if categories.expense %}
                 <ul class="list-group list-group-flush">
                     {% for category in categories.expense %}
-                    <li class="list-group-item">{{ category }}</li>
+                    <li class="list-group-item"><i class="bi bi-tag"></i> {{ category }}</li>
                     {% endfor %}
                 </ul>
                 {% else %}

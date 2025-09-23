@@ -99,6 +99,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // Responsive enhancements
+    handleResponsiveLayout();
+    window.addEventListener('resize', handleResponsiveLayout);
 });
 
 // Function to confirm deletion
@@ -111,5 +115,66 @@ function toggleFilters() {
     const filterSection = document.getElementById('filter-section');
     if (filterSection) {
         filterSection.style.display = filterSection.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+// Handle responsive layout adjustments
+function handleResponsiveLayout() {
+    const width = window.innerWidth;
+    
+    // Adjust navbar behavior for mobile
+    const navbar = document.querySelector('.navbar-collapse');
+    if (navbar) {
+        if (width < 992) {
+            // On mobile, ensure navbar is collapsed by default
+            navbar.classList.remove('show');
+        }
+    }
+    
+    // Adjust card layouts for different screen sizes
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        if (width < 576) {
+            // On extra small screens, reduce padding
+            card.classList.add('px-2');
+        } else {
+            card.classList.remove('px-2');
+        }
+    });
+    
+    // Adjust button layouts for mobile
+    const actionButtons = document.querySelectorAll('.btn-action');
+    actionButtons.forEach(button => {
+        if (width < 576) {
+            // On mobile, make buttons full width
+            button.classList.add('w-100');
+            button.classList.remove('me-2');
+        } else {
+            button.classList.remove('w-100');
+            button.classList.add('me-2');
+        }
+    });
+    
+    // Adjust table responsiveness
+    const tables = document.querySelectorAll('.table-responsive');
+    tables.forEach(table => {
+        if (width < 768) {
+            // On mobile, ensure tables are scrollable
+            table.classList.add('overflow-auto');
+        }
+    });
+}
+
+// Enhanced toggle filters function with responsive behavior
+function toggleFilters() {
+    const filterSection = document.getElementById('filter-section');
+    if (filterSection) {
+        const isHidden = filterSection.style.display === 'none';
+        filterSection.style.display = isHidden ? 'block' : 'none';
+        
+        // On mobile, scroll to filters when opened
+        if (isHidden && window.innerWidth < 768) {
+            filterSection.scrollIntoView({ behavior: 'smooth' });
+        }
     }
 }

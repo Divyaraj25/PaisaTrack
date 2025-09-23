@@ -5,7 +5,7 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <h1 class="mb-4">Add Account</h1>
+        <h1 class="mb-4"><i class="bi bi-plus-circle"></i> Add Account</h1>
     </div>
 </div>
 
@@ -15,35 +15,35 @@
             <div class="card-body">
                 <form method="POST">
                     <div class="mb-3">
-                        <label for="account_type" class="form-label">Account Type</label>
+                        <label for="account_type" class="form-label"><i class="bi bi-wallet"></i> Account Type</label>
                         <select class="form-select" id="account_type" name="account_type" required>
                             <option value="">Select Account Type</option>
-                            <option value="Cash">Cash</option>
-                            <option value="Debit Card">Debit Card</option>
-                            <option value="Credit Card">Credit Card</option>
-                            <option value="Bank Account">Bank Account</option>
+                            <option value="Cash"><i class="bi bi-cash"></i> Cash</option>
+                            <option value="Debit Card"><i class="bi bi-credit-card"></i> Debit Card</option>
+                            <option value="Credit Card"><i class="bi bi-credit-card-2-back"></i> Credit Card</option>
+                            <option value="Bank Account"><i class="bi bi-bank"></i> Bank Account</option>
                         </select>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="initial_amount" class="form-label">Initial Amount</label>
+                        <label for="initial_amount" class="form-label"><i class="bi bi-currency-rupee"></i> Initial Amount</label>
                         <div class="input-group">
                             <span class="input-group-text">₹</span>
                             <input type="number" class="form-control" id="initial_amount" name="initial_amount" step="0.01" required>
                         </div>
-                        <div class="form-text">For Credit Cards, enter the credit limit.</div>
+                        <div class="form-text"><i class="bi bi-info-circle"></i> For Credit Cards, enter the credit limit.</div>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="last_digits" class="form-label">Last 4 Digits (Optional)</label>
+                        <label for="last_digits" class="form-label"><i class="bi bi-hash"></i> Last 4 Digits (Optional)</label>
                         <input type="text" class="form-control" id="last_digits" name="last_digits" maxlength="4" placeholder="1234">
-                        <div class="form-text">For cards and bank accounts only.</div>
+                        <div class="form-text"><i class="bi bi-info-circle"></i> For cards and bank accounts only.</div>
                     </div>
                     
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-plus-circle"></i> Add Account
                     </button>
-                    <a href="{{ url_for('main.accounts') }}" class="btn btn-secondary">Cancel</a>
+                    <a href="{{ url_for('main.accounts') }}" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Cancel</a>
                 </form>
             </div>
         </div>
@@ -52,16 +52,16 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Account Types</h5>
-                <ul>
-                    <li><strong>Cash:</strong> Physical cash you have</li>
-                    <li><strong>Debit Card:</strong> Linked to your bank account</li>
-                    <li><strong>Credit Card:</strong> Credit line you can borrow against</li>
-                    <li><strong>Bank Account:</strong> Savings or checking account</li>
+                <h5 class="card-title"><i class="bi bi-info-circle"></i> Account Types</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><i class="bi bi-cash text-success"></i> <strong>Cash:</strong> Physical cash you have</li>
+                    <li class="list-group-item"><i class="bi bi-credit-card text-primary"></i> <strong>Debit Card:</strong> Linked to your bank account</li>
+                    <li class="list-group-item"><i class="bi bi-credit-card-2-back text-danger"></i> <strong>Credit Card:</strong> Credit line you can borrow against</li>
+                    <li class="list-group-item"><i class="bi bi-bank text-info"></i> <strong>Bank Account:</strong> Savings or checking account</li>
                 </ul>
-                <p class="text-muted">
+                <div class="alert alert-info mt-3">
                     <i class="bi bi-info-circle"></i> You can add multiple accounts of the same type.
-                </p>
+                </div>
             </div>
         </div>
     </div>
