@@ -102,7 +102,7 @@ sudo apt update > /dev/null 2>&1
 # Install required packages
 print_status "Installing git, python3, pip, and nginx..."
 show_loading 10 "Installing packages"
-sudo apt install -y git python3 python3-pip nginx > /dev/null 2>&1
+sudo apt install -y git python3 python3-pip nginx bc > /dev/null 2>&1
 
 # Ask for repository URL
 echo ""
@@ -122,7 +122,7 @@ print_success "Repository cloned to ./$REPO_NAME"
 print_status "Installing Python requirements..."
 show_loading 15 "Installing Python packages"
 cd $REPO_NAME
-pip3 install -r requirements.txt > /dev/null 2>&1
+pip3 install Flask pymongo dnspython python-dotenv PyJWT bcrypt > /dev/null 2>&1
 
 # Ask for environment variables
 echo ""
@@ -168,6 +168,15 @@ print_status "Initializing database collections..."
 show_loading 8 "Setting up database"
 python3 init_mongo.py > /dev/null 2>&1
 print_success "Database collections initialized successfully"
+
+# Display default login credentials
+echo ""
+echo -e "${YELLOW}┌─────────────────────────────────────────────────────────────────────────────┐${NC}"
+echo -e "${YELLOW}│ Default Login Credentials                                                   │${NC}"
+echo -e "${YELLOW}└─────────────────────────────────────────────────────────────────────────────┘${NC}"
+print_success "Admin User: admin@paisatrack.com / admin123"
+print_success "Test User: test@paisatrack.com / test123"
+echo ""
 
 # Ask for server IP and port
 echo ""
@@ -270,4 +279,8 @@ echo "  sudo journalctl -u paisatrack -f"
 echo ""
 print_status "To restart the application:"
 echo "  sudo systemctl restart paisatrack"
+echo ""
+print_status "Default login credentials:"
+echo "  Admin: admin@paisatrack.com / admin123"
+echo "  User: test@paisatrack.com / test123"
 echo ""

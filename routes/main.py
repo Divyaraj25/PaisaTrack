@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app, g
 from models.finance import FinanceModel
+from routes.auth import token_required
 from datetime import datetime, timedelta
 import calendar
 
@@ -15,13 +16,20 @@ def get_model():
         model = FinanceModel()
     return model
 
+def get_user_id():
+    """Get current user ID from request context"""
+    if hasattr(request, 'current_user') and request.current_user:
+        return str(request.current_user['_id'])
+    return None
 @main.route('/')
+@token_required
 def index():
     """Home page - shows account balances"""
     model = get_model()
+    user_id = get_user_id()
     
-    accounts = model.get_accounts()
-    transactions = model.get_transactions()
+    accounts = model.get_accounts(user_id)
+    transactions = model.get_transactions(user_id=user_id)
     
     # Calculate current balances
     balances = calculate_balances(accounts, transactions)
@@ -59,17 +67,21 @@ def index():
                           net_worth=net_worth)
 
 @main.route('/accounts')
+@token_required
 def accounts():
     """View all accounts"""
     model = get_model()
+    user_id = get_user_id()
     
-    accounts = model.get_accounts()
+    accounts = model.get_accounts(user_id)
     return render_template('accounts.html', accounts=accounts)
 
 @main.route('/accounts/add', methods=['GET', 'POST'])
+@token_required
 def add_account():
     """Add a new account"""
     model = get_model()
+    user_id = get_user_id()
     
     if request.method == 'POST':
         account_type = request.form['account_type']
@@ -87,20 +99,22 @@ def add_account():
             "created_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         
-        model.create_account(account_data)
+        model.create_account(account_data, user_id)
         flash(f"Account {account_type} added successfully!", "success")
         return redirect(url_for('main.accounts'))
     
     return render_template('add_account.html')
 
 @main.route('/transactions')
+@token_required
 def transactions():
     """View all transactions"""
     model = get_model()
+    user_id = get_user_id()
     
-    accounts = model.get_accounts()
+    accounts = model.get_accounts(user_id)
     categories = model.get_categories()
-    transactions = model.get_transactions()
+    transactions = model.get_transactions(user_id=user_id)
     
     # Calculate current balances
     balances = calculate_balances(accounts, transactions)
@@ -122,7 +136,7 @@ def transactions():
         else:
             filter_query['account'] = account
     
-    filtered_transactions = model.get_transactions(filter_query)
+    filtered_transactions = model.get_transactions(filter_query, user_id)
     
     # Sort transactions by date (newest first)
     filtered_transactions.sort(key=lambda x: x['date'], reverse=True)
@@ -149,15 +163,17 @@ def transactions():
                           account=account)
 
 @main.route('/transactions/add', methods=['GET', 'POST'])
+@token_required
 def add_transaction():
     """Add a new transaction"""
     model = get_model()
+    user_id = get_user_id()
     
-    accounts = model.get_accounts()
+    accounts = model.get_accounts(user_id)
     categories = model.get_categories()
     
     # Calculate current balances
-    transactions = model.get_transactions()
+    transactions = model.get_transactions(user_id=user_id)
     balances = calculate_balances(accounts, transactions)
     
     if request.method == 'POST':
@@ -213,7 +229,7 @@ def add_transaction():
                 flash("Category is required for transfer transactions!", "error")
                 return redirect(url_for('main.add_transaction'))
         
-        model.create_transaction(transaction_data)
+        model.create_transaction(transaction_data, user_id)
         flash("Transaction added successfully!", "success")
         return redirect(url_for('main.transactions'))
     
@@ -223,12 +239,14 @@ def add_transaction():
                           balances=balances)
 
 @main.route('/budgets')
+@token_required
 def budgets():
     """View all budgets"""
     model = get_model()
+    user_id = get_user_id()
     
-    budgets = model.get_budgets()
-    transactions = model.get_transactions()
+    budgets = model.get_budgets(user_id=user_id)
+    transactions = model.get_transactions(user_id=user_id)
     
     # Add status and spending info to each budget
     today = datetime.now().strftime("%Y-%m-%d")
@@ -252,9 +270,11 @@ def budgets():
     return render_template('budgets.html', budgets=budgets)
 
 @main.route('/budgets/add', methods=['GET', 'POST'])
+@token_required
 def add_budget():
     """Add a new budget"""
     model = get_model()
+    user_id = get_user_id()
     
     categories = model.get_categories()
     
@@ -293,13 +313,14 @@ def add_budget():
             "period": period
         }
         
-        model.create_budget(budget_data)
+        model.create_budget(budget_data, user_id)
         flash(f"Budget for {category} added successfully!", "success")
         return redirect(url_for('main.budgets'))
     
     return render_template('add_budget.html', categories=categories)
 
 @main.route('/categories')
+@token_required
 def categories():
     """View all categories"""
     model = get_model()
@@ -308,6 +329,7 @@ def categories():
     return render_template('categories.html', categories=categories)
 
 @main.route('/categories/manage', methods=['GET', 'POST'])
+@token_required
 def manage_categories():
     """Manage categories"""
     model = get_model()
@@ -336,6 +358,7 @@ def manage_categories():
     return render_template('manage_categories.html', categories=categories)
 
 @main.route('/info')
+@token_required
 def info():
     """View information page"""
     model = get_model()
