@@ -1,122 +1,5 @@
 // Script for PaisaTrack
 
-// Authentication utilities
-const AuthUtils = {
-    // Get token from localStorage
-    getToken: function() {
-        return localStorage.getItem('paisatrack_token');
-    },
-    
-    // Set token in localStorage
-    setToken: function(token) {
-        localStorage.setItem('paisatrack_token', token);
-    },
-    
-    // Remove token from localStorage
-    removeToken: function() {
-        localStorage.removeItem('paisatrack_token');
-    },
-    
-    // Get user info from localStorage
-    getUser: function() {
-        const userStr = localStorage.getItem('paisatrack_user');
-        return userStr ? JSON.parse(userStr) : null;
-    },
-    
-    // Set user info in localStorage
-    setUser: function(user) {
-        localStorage.setItem('paisatrack_user', JSON.stringify(user));
-    },
-    
-    // Remove user info from localStorage
-    removeUser: function() {
-        localStorage.removeItem('paisatrack_user');
-    },
-    
-    // Check if user is authenticated
-    isAuthenticated: function() {
-        return !!this.getToken();
-    },
-    
-    // Get authorization headers
-    getAuthHeaders: function() {
-        const token = this.getToken();
-        return token ? {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        } : {
-            'Content-Type': 'application/json'
-        };
-    },
-    
-    // Logout user
-    logout: function() {
-        this.removeToken();
-        this.removeUser();
-        window.location.href = '/auth/login';
-    }
-};
-
-// API utilities
-const ApiUtils = {
-    // Make authenticated API request
-    request: async function(url, options = {}) {
-        const defaultOptions = {
-            headers: AuthUtils.getAuthHeaders()
-        };
-        
-        const mergedOptions = {
-            ...defaultOptions,
-            ...options,
-            headers: {
-                ...defaultOptions.headers,
-                ...options.headers
-            }
-        };
-        
-        try {
-            const response = await fetch(url, mergedOptions);
-            
-            // Handle authentication errors
-            if (response.status === 401) {
-                AuthUtils.logout();
-                return null;
-            }
-            
-            return response;
-        } catch (error) {
-            console.error('API request failed:', error);
-            return null;
-        }
-    },
-    
-    // GET request
-    get: function(url) {
-        return this.request(url, { method: 'GET' });
-    },
-    
-    // POST request
-    post: function(url, data) {
-        return this.request(url, {
-            method: 'POST',
-            body: JSON.stringify(data)
-        });
-    },
-    
-    // PUT request
-    put: function(url, data) {
-        return this.request(url, {
-            method: 'PUT',
-            body: JSON.stringify(data)
-        });
-    },
-    
-    // DELETE request
-    delete: function(url) {
-        return this.request(url, { method: 'DELETE' });
-    }
-};
-
 // Function to format currency
 function formatCurrency(amount) {
     // Format as Indian Rupees
@@ -171,9 +54,6 @@ function handleCreditCardPayment() {
 
 // Initialize date pickers
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize authentication state
-    initializeAuth();
-    
     // Set today's date as default for date inputs
     const today = new Date().toISOString().split('T')[0];
     const dateInputs = document.querySelectorAll('input[type="date"]');
@@ -224,36 +104,6 @@ document.addEventListener('DOMContentLoaded', function() {
     handleResponsiveLayout();
     window.addEventListener('resize', handleResponsiveLayout);
 });
-
-// Initialize authentication state
-function initializeAuth() {
-    // Check if we're on login page
-    if (window.location.pathname === '/auth/login') {
-        return;
-    }
-    
-    // Check if user is authenticated
-    if (!AuthUtils.isAuthenticated()) {
-        // Redirect to login if not authenticated
-        window.location.href = '/auth/login';
-        return;
-    }
-    
-    // Update UI with user info
-    updateUserUI();
-}
-
-// Update UI with user information
-function updateUserUI() {
-    const user = AuthUtils.getUser();
-    if (user) {
-        // Update navbar with user info
-        const userDropdown = document.getElementById('navbarDropdown');
-        if (userDropdown) {
-            userDropdown.innerHTML = `<i class="bi bi-person-circle"></i> ${user.username}`;
-        }
-    }
-}
 
 // Function to confirm deletion
 function confirmDelete(message) {
@@ -328,35 +178,3 @@ function toggleFilters() {
         }
     }
 }
-
-// Handle logout
-function handleLogout() {
-    if (confirm('Are you sure you want to logout?')) {
-        // Make logout API call
-        ApiUtils.post('/auth/logout', {})
-            .then(response => {
-                if (response && response.ok) {
-                    AuthUtils.logout();
-                } else {
-                    // Force logout even if API call fails
-                    AuthUtils.logout();
-                }
-            })
-            .catch(error => {
-                console.error('Logout error:', error);
-                // Force logout even if API call fails
-                AuthUtils.logout();
-            });
-    }
-}
-
-// Add event listeners for logout buttons
-document.addEventListener('DOMContentLoaded', function() {
-    const logoutButtons = document.querySelectorAll('[data-logout]');
-    logoutButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            handleLogout();
-        });
-    });
-});
