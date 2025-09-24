@@ -124,6 +124,51 @@ show_loading 15 "Installing Python packages"
 cd $REPO_NAME
 pip3 install -r requirements.txt > /dev/null 2>&1
 
+# Ask for environment variables
+echo ""
+echo -e "${YELLOW}┌─────────────────────────────────────────────────────────────────────────────┐${NC}"
+echo -e "${YELLOW}│ Environment Variables Setup                                                 │${NC}"
+echo -e "${YELLOW}└─────────────────────────────────────────────────────────────────────────────┘${NC}"
+print_status "Please enter your MongoDB Atlas connection string:"
+read -p "MongoDB Atlas URL: " MONGO_URL
+
+# Create .env file
+print_status "Creating environment configuration..."
+show_loading 3 "Creating .env file"
+
+cat > .env <<EOF
+MONGO_URI=$MONGO_URL
+FLASK_ENV=production
+SECRET_KEY=$(openssl rand -hex 32)
+EOF
+
+print_success "Environment file created with MongoDB Atlas URL"
+
+# Ask for additional environment variables
+echo ""
+print_status "Do you want to add any additional environment variables? (y/N):"
+read ADD_ENV
+if [[ $ADD_ENV =~ ^[Yy]$ ]]; then
+    while true; do
+        echo ""
+        print_status "Enter variable name (or 'done' to finish):"
+        read VAR_NAME
+        if [[ $VAR_NAME == "done" ]]; then
+            break
+        fi
+        print_status "Enter value for $VAR_NAME:"
+        read VAR_VALUE
+        echo "$VAR_NAME=$VAR_VALUE" >> .env
+        print_success "Added $VAR_NAME to environment file"
+    done
+fi
+
+# Initialize MongoDB (run init script to set up collections)
+print_status "Initializing database collections..."
+show_loading 8 "Setting up database"
+python3 init_mongo.py > /dev/null 2>&1
+print_success "Database collections initialized successfully"
+
 # Ask for server IP and port
 echo ""
 echo -e "${YELLOW}┌─────────────────────────────────────────────────────────────────────────────┐${NC}"
@@ -189,6 +234,7 @@ After=network.target
 Type=simple
 User=www-data
 WorkingDirectory=/home/ubuntu/$REPO_NAME
+EnvironmentFile=/home/ubuntu/$REPO_NAME/.env
 ExecStart=/usr/bin/python3 /home/ubuntu/$REPO_NAME/app.py
 Restart=always
 
@@ -215,6 +261,7 @@ echo ""
 print_success "PaisaTrack has been installed and started."
 echo -e "${GREEN}${STAR}${NC} Application is running on: http://$SERVER_IP"
 echo ""
+print_status "Environment variables have been configured in .env file"
 print_status "To check the application status, you can use:"
 echo "  sudo systemctl status paisatrack"
 echo ""

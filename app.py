@@ -1,13 +1,19 @@
 from flask import Flask
 from routes import main
 from utils.database import init_db, init_app
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Application version
 APP_VERSION = "1.0.0"
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'your-secret-key-here'
+    # Use SECRET_KEY from environment variables, with fallback to default
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')
     
     # Initialize MongoDB
     init_db(app)

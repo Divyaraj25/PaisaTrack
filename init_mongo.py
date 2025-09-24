@@ -5,9 +5,12 @@ import json
 import os
 from pymongo import MongoClient
 from datetime import datetime
+from dotenv import load_dotenv
 
 # MongoDB connection
-client = MongoClient('mongodb://localhost:27017/')
+load_dotenv()
+MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017/')
+client = MongoClient(MONGO_URI)
 db = client['paisatrackIN']
 
 # Collections
