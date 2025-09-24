@@ -6,7 +6,6 @@ import os
 from pymongo import MongoClient
 from datetime import datetime
 from dotenv import load_dotenv
-from models.user import UserModel
 
 # MongoDB connection
 load_dotenv()
@@ -17,7 +16,6 @@ db = client['paisatrackIN']
 # Collections
 info_collection = db['info']
 categories_collection = db['categories']
-users_collection = db['users']
 
 def load_json_file(filename):
     """Load data from JSON file"""
@@ -26,62 +24,29 @@ def load_json_file(filename):
             return json.load(f)
     return None
 
-def init_users():
-    """Initialize users collection with first admin user"""
-    users_collection.delete_many({})  # Clear existing data
-    
-    # Create first admin user
-    user_model = UserModel()
-    admin_user, error = user_model.create_user(
-        username="admin",
-        email="admin@paisatrack.com",
-        password="admin123",
-        role="admin"
-    )
-    
-    if admin_user:
-        print(f"Created admin user: admin@paisatrack.com / admin123")
-    else:
-        print(f"Error creating admin user: {error}")
-    
-    # Create test user
-    test_user, error = user_model.create_user(
-        username="testuser",
-        email="test@paisatrack.com",
-        password="test123",
-        role="user"
-    )
-    
-    if test_user:
-        print(f"Created test user: test@paisatrack.com / test123")
-    else:
-        print(f"Error creating test user: {error}")
 def init_categories():
     """Initialize categories data with default values"""
     categories_collection.delete_many({})  # Clear existing data
     
-    # Load categories from file
-    default_categories = load_json_file('categories.json')
-    if not default_categories:
-        # Fallback to hardcoded categories
-        default_categories = {
-            "income": ["Salary", "Freelance", "Investment", "Gift", "Business", "Bonus", "Dividend", "Rental Income", "Other"],
-            "expense": ["Food", "Transport", "Entertainment", "Utilities", "Rent", "Healthcare", 
-                       "Education", "Shopping", "Travel", "Personal Care", "Insurance", "Taxes", 
-                       "Subscriptions", "Maintenance", "Charity", "Other"],
-            "transfer": ["Cash to Bank", "Bank to Card", "Card to Cash", "Between Accounts", 
-                        "Credit Card Payment", "Bank Transfer", "Investment Transfer", "Loan Payment"]
-        }
+    # Default categories with more options
+    default_categories = {
+        "income": ["Salary", "Freelance", "Investment", "Gift", "Business", "Bonus", "Dividend", "Rental Income", "Other"],
+        "expense": ["Food", "Transport", "Entertainment", "Utilities", "Rent", "Healthcare", 
+                   "Education", "Shopping", "Travel", "Personal Care", "Insurance", "Taxes", 
+                   "Subscriptions", "Maintenance", "Charity", "Other"],
+        "transfer": ["Cash to Bank", "Bank to Card", "Card to Cash", "Between Accounts", 
+                    "Credit Card Payment", "Bank Transfer", "Investment Transfer", "Loan Payment"]
+    }
     
     categories_collection.insert_one(default_categories)
-    print(f"Initialized categories from file")
+    print(f"Initialized categories with default values")
 
 def init_info():
     """Initialize info data"""
     info_collection.delete_many({})  # Clear existing data
     
-    # Load info from file
-    info_data = load_json_file('finance_info.json')
+    # info_data = load_json_file('../finance_info.json')
+    info_data = None
     if info_data:
         info_collection.insert_one(info_data)
         print(f"Initialized info data from finance_info.json")
@@ -320,15 +285,11 @@ def main():
     """Main initialization function"""
     print("Starting fresh initialization of MongoDB...")
     
-    # Initialize users, categories and info
-    init_users()
+    # Initialize categories and info only
     init_categories()
     init_info()
     
     print("Fresh initialization completed successfully!")
-    print("\nDefault login credentials:")
-    print("Admin: admin@paisatrack.com / admin123")
-    print("User: test@paisatrack.com / test123")
 
 if __name__ == "__main__":
     main()

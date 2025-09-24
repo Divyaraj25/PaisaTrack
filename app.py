@@ -1,5 +1,5 @@
 from flask import Flask
-from routes import main, auth
+from routes import main
 from utils.database import init_db, init_app
 import os
 from dotenv import load_dotenv
@@ -26,7 +26,6 @@ def create_app():
     
     # Register blueprints
     app.register_blueprint(main)
-    app.register_blueprint(auth, url_prefix='/auth')
     
     return app
 

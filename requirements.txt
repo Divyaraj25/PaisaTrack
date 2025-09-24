@@ -2,5 +2,3 @@ Flask
 pymongo
 dnspython
 python-dotenv
-PyJWT
-bcrypt
