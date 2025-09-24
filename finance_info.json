@@ -1,0 +1,226 @@
+{
+  "introduction": "Personal Finance Tracker helps you manage your income, expenses, and budgets effectively.",
+  "features": {
+    "balance_tracking": "Track balances across multiple accounts (Cash, Debit Card, Credit Card, Bank Account)",
+    "transaction_management": "Record income, expenses, and transfers with categories and dates",
+    "budgeting": "Set budgets with various timeframes (custom, weekly, monthly, yearly)",
+    "reporting": "View transactions, budgets, and financial insights",
+    "account_management": "Manage account details including last 4 digits and initial amounts"
+  },
+  "calculations": {
+    "net_worth": "Total Assets - Total Liabilities",
+    "budget_utilization": "(Amount Spent / Budget Amount) * 100",
+    "account_balance": "Initial Amount + Total Income - Total Expenses + Net Transfers"
+  },
+  "examples": {
+    "income_example": {
+      "type": "income",
+      "account": "Bank Account",
+      "category": "Salary",
+      "amount": "50000",
+      "description": "Monthly salary credit"
+    },
+    "expense_example": {
+      "type": "expense",
+      "account": "Credit Card",
+      "category": "Food",
+      "amount": "1500",
+      "description": "Dinner at restaurant"
+    },
+    "budget_example": {
+      "category": "Food",
+      "amount": "10000",
+      "period": "monthly",
+      "start_date": "2023-11-01",
+      "end_date": "2023-11-30"
+    },
+    "comprehensive_example": {
+      "scenario": "Monthly Financial Management",
+      "description": "A real-world example showing how to manage personal finances for a month with multiple accounts, income sources, and expenses",
+      "accounts": [
+        {
+          "type": "Bank Account",
+          "initial_amount": 100000,
+          "description": "Primary savings account with initial balance"
+        },
+        {
+          "type": "Credit Card",
+          "initial_amount": -25000,
+          "description": "Credit card with existing debt (negative balance)"
+        },
+        {
+          "type": "Cash",
+          "initial_amount": 5000,
+          "description": "Physical cash on hand"
+        },
+        {
+          "type": "Investment Account",
+          "initial_amount": 200000,
+          "description": "Long-term investment portfolio"
+        }
+      ],
+      "transactions": [
+        {
+          "type": "income",
+          "account": "Bank Account",
+          "category": "Salary",
+          "amount": 75000,
+          "date": "2023-11-01",
+          "description": "Monthly salary deposit"
+        },
+        {
+          "type": "income",
+          "account": "Bank Account",
+          "category": "Investment",
+          "amount": 5000,
+          "date": "2023-11-02",
+          "description": "Dividend income from stocks"
+        },
+        {
+          "type": "expense",
+          "account": "Credit Card",
+          "category": "Rent",
+          "amount": 25000,
+          "date": "2023-11-02",
+          "description": "Monthly rent payment"
+        },
+        {
+          "type": "transfer",
+          "from_account": "Bank Account",
+          "to_account": "Credit Card",
+          "category": "Credit Card Payment",
+          "amount": 25000,
+          "date": "2023-11-03",
+          "description": "Credit card bill payment"
+        },
+        {
+          "type": "expense",
+          "account": "Cash",
+          "category": "Food",
+          "amount": 3000,
+          "date": "2023-11-05",
+          "description": "Weekly grocery shopping"
+        },
+        {
+          "type": "transfer",
+          "from_account": "Bank Account",
+          "to_account": "Cash",
+          "category": "Cash Withdrawal",
+          "amount": 5000,
+          "date": "2023-11-06",
+          "description": "ATM cash withdrawal"
+        },
+        {
+          "type": "expense",
+          "account": "Credit Card",
+          "category": "Utilities",
+          "amount": 2500,
+          "date": "2023-11-07",
+          "description": "Electricity and water bills"
+        },
+        {
+          "type": "expense",
+          "account": "Bank Account",
+          "category": "Insurance",
+          "amount": 8000,
+          "date": "2023-11-10",
+          "description": "Annual health insurance premium"
+        },
+        {
+          "type": "transfer",
+          "from_account": "Bank Account",
+          "to_account": "Investment Account",
+          "category": "Investment Transfer",
+          "amount": 15000,
+          "date": "2023-11-15",
+          "description": "Monthly investment contribution"
+        },
+        {
+          "type": "expense",
+          "account": "Credit Card",
+          "category": "Entertainment",
+          "amount": 3500,
+          "date": "2023-11-20",
+          "description": "Movie tickets and dinner"
+        },
+        {
+          "type": "expense",
+          "account": "Bank Account",
+          "category": "Shopping",
+          "amount": 12000,
+          "date": "2023-11-22",
+          "description": "Clothing and household items"
+        },
+        {
+          "type": "transfer",
+          "from_account": "Investment Account",
+          "to_account": "Bank Account",
+          "category": "Investment Transfer",
+          "amount": 10000,
+          "date": "2023-11-25",
+          "description": "Withdrawal for emergency fund"
+        }
+      ],
+      "budgets": [
+        {
+          "category": "Food",
+          "amount": 12000,
+          "period": "monthly",
+          "start_date": "2023-11-01",
+          "end_date": "2023-11-30",
+          "description": "Monthly food budget including groceries and dining out"
+        },
+        {
+          "category": "Entertainment",
+          "amount": 5000,
+          "period": "monthly",
+          "start_date": "2023-11-01",
+          "end_date": "2023-11-30",
+          "description": "Monthly entertainment budget for movies, events, etc."
+        },
+        {
+          "category": "Shopping",
+          "amount": 10000,
+          "period": "monthly",
+          "start_date": "2023-11-01",
+          "end_date": "2023-11-30",
+          "description": "Monthly shopping budget for clothing and household items"
+        },
+        {
+          "category": "Utilities",
+          "amount": 3000,
+          "period": "monthly",
+          "start_date": "2023-11-01",
+          "end_date": "2023-11-30",
+          "description": "Monthly utilities budget for electricity, water, internet, etc."
+        }
+      ],
+      "financial_summary": {
+        "total_income": 80000,
+        "total_expenses": 56000,
+        "net_savings": 24000,
+        "account_balances": {
+          "Bank Account": 147000,
+          "Credit Card": 0,
+          "Cash": 2000,
+          "Investment Account": 205000
+        },
+        "net_worth": 354000
+      }
+    }
+  },
+  "tips": [
+    "Review your expenses weekly to identify spending patterns",
+    "Set realistic budgets based on your historical spending",
+    "Pay credit card bills in full to avoid interest charges",
+    "Maintain an emergency fund equivalent to 3-6 months of expenses",
+    "Categorize transactions promptly for accurate reporting",
+    "Use the budgeting feature to plan for large expenses"
+  ],
+  "how_to_use": {
+    "initial_setup": "Start by adding your accounts with initial amounts",
+    "adding_transactions": "Record all income and expenses as they occur",
+    "setting_budgets": "Create budgets for expense categories with appropriate timeframes",
+    "reviewing_reports": "Regularly check your balance, transactions, and budget status"
+  }
+}
