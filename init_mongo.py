@@ -42,8 +42,8 @@ def init_info():
     """Initialize info data"""
     info_collection.delete_many({})  # Clear existing data
     
-    info_data = load_json_file('../finance_info.json')
-    # info_data = None
+    # info_data = load_json_file('../finance_info.json')
+    info_data = None
     if info_data:
         info_collection.insert_one(info_data)
         print(f"Initialized info data from finance_info.json")
