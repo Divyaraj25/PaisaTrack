@@ -6,6 +6,7 @@ import os
 from pymongo import MongoClient
 from datetime import datetime
 from dotenv import load_dotenv
+from werkzeug.security import generate_password_hash
 
 # MongoDB connection
 load_dotenv()
@@ -16,6 +17,7 @@ db = client['paisatrackIN']
 # Collections
 info_collection = db['info']
 categories_collection = db['categories']
+users_collection = db['users']
 
 def load_json_file(filename):
     """Load data from JSON file"""
@@ -24,35 +26,80 @@ def load_json_file(filename):
             return json.load(f)
     return None
 
-def init_categories():
+def init_users():
+    """Initialize users collection with indexes"""
+    # Create indexes for better performance
+    users_collection.create_index("username", unique=True)
+    users_collection.create_index("email", unique=True)
+    
+    # Check if any users exist
+    if users_collection.count_documents({}) == 0:
+        print("No users found. Let's create an initial user.")
+        # Ask for user details
+        username = input("Enter username: ")
+        email = input("Enter email: ")
+        password = input("Enter password: ")
+        
+        # Create initial user
+        hashed_password = generate_password_hash(password)
+        user_data = {
+            "username": username,
+            "email": email,
+            "contact_number": "",
+            "password_hash": hashed_password,
+            "last_login": None,
+            "created_at": datetime.now(),
+            "updated_at": datetime.now(),
+            "last_token": None,
+            "reset_token": None,
+            "reset_token_expires": None
+        }
+        
+        result = users_collection.insert_one(user_data)
+        user_id = str(result.inserted_id)
+        print(f"User {username} created successfully with ID: {user_id}")
+        return user_id
+    else:
+        print(f"Found {users_collection.count_documents({})} existing users.")
+        # Return the first user's ID
+        first_user = users_collection.find_one()
+        return str(first_user['_id'])
+
+def init_categories(user_id=None):
     """Initialize categories data with default values"""
     categories_collection.delete_many({})  # Clear existing data
     
-    # Default categories with more options
-    default_categories = {
-        "income": ["Salary", "Freelance", "Investment", "Gift", "Business", "Bonus", "Dividend", "Rental Income", "Other"],
-        "expense": ["Food", "Transport", "Entertainment", "Utilities", "Rent", "Healthcare", 
-                   "Education", "Shopping", "Travel", "Personal Care", "Insurance", "Taxes", 
-                   "Subscriptions", "Maintenance", "Charity", "Other"],
-        "transfer": ["Cash to Bank", "Bank to Card", "Card to Cash", "Between Accounts", 
-                    "Credit Card Payment", "Bank Transfer", "Investment Transfer", "Loan Payment"]
-    }
+    # Load categories from JSON file
+    categories_data = load_json_file('categories.json')
+    if not categories_data:
+        # Default categories with more options
+        categories_data = {
+            "income": ["Salary", "Freelance", "Investment", "Gift", "Business", "Bonus", "Dividend", "Rental Income", "Other"],
+            "expense": ["Food", "Transport", "Entertainment", "Utilities", "Rent", "Healthcare", 
+                       "Education", "Shopping", "Travel", "Personal Care", "Insurance", "Taxes", 
+                       "Subscriptions", "Maintenance", "Charity", "Other"],
+            "transfer": ["Cash to Bank", "Bank to Card", "Card to Cash", "Between Accounts", 
+                        "Credit Card Payment", "Bank Transfer", "Investment Transfer", "Loan Payment"]
+        }
     
-    categories_collection.insert_one(default_categories)
-    print(f"Initialized categories with default values")
+    # Link categories with user_id if provided
+    if user_id:
+        categories_data["user_id"] = user_id
+        categories_collection.insert_one(categories_data)
+        print(f"Initialized categories from categories.json for user {user_id}")
+    else:
+        categories_collection.insert_one(categories_data)
+        print(f"Initialized categories from categories.json (common data)")
 
 def init_info():
     """Initialize info data"""
     info_collection.delete_many({})  # Clear existing data
     
-    # info_data = load_json_file('../finance_info.json')
-    info_data = None
-    if info_data:
-        info_collection.insert_one(info_data)
-        print(f"Initialized info data from finance_info.json")
-    else:
+    # Load info data from JSON file
+    info_data = load_json_file('finance_info.json')
+    if not info_data:
         # Create default info data
-        default_info = {
+        info_data = {
             "introduction": "Personal Finance Tracker helps you manage your income, expenses, and budgets effectively.",
             "features": {
                 "balance_tracking": "Track balances across multiple accounts (Cash, Debit Card, Credit Card, Bank Account)",
@@ -278,16 +325,20 @@ def init_info():
                 "reviewing_reports": "Regularly check your balance, transactions, and budget status"
             }
         }
-        info_collection.insert_one(default_info)
-        print(f"Initialized info data with default values")
+    
+    info_collection.insert_one(info_data)
+    print(f"Initialized info data from finance_info.json (common data)")
 
 def main():
     """Main initialization function"""
     print("Starting fresh initialization of MongoDB...")
     
-    # Initialize categories and info only
-    init_categories()
-    init_info()
+    # Initialize users and get user ID
+    user_id = init_users()
+    
+    # Initialize all collections
+    init_categories(user_id)  # Link categories with the initial user
+    init_info()  # Info is common for all users
     
     print("Fresh initialization completed successfully!")
 

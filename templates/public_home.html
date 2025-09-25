@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Home - PaisaTrack{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center py-5">
+                <img src="{{ url_for('static', filename='images/rupee.png') }}" alt="PaisaTrack Logo" class="img-fluid project-icon mb-4 mx-auto d-block" style="height: 80px;">
+                <h1 class="card-title">Welcome to PaisaTrack</h1>
+                <p class="card-text lead">Your personal finance management solution</p>
+                <p class="card-text">Track expenses, manage budgets, and achieve your financial goals</p>
+                <div class="mt-4">
+                    <a href="/login" class="btn btn-light btn-lg me-3">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </a>
+                    <a href="/register" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-person-plus"></i> Register
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="text-center mb-4">Features</h2>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 feature-card">
+            <div class="card-body text-center">
+                <i class="bi bi-wallet2 feature-icon text-primary"></i>
+                <h5 class="card-title">Account Management</h5>
+                <p class="card-text">Track all your bank accounts, credit cards, and wallets in one place.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 feature-card">
+            <div class="card-body text-center">
+                <i class="bi bi-arrow-left-right feature-icon text-success"></i>
+                <h5 class="card-title">Transaction Tracking</h5>
+                <p class="card-text">Record income, expenses, and transfers with detailed categorization.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 feature-card">
+            <div class="card-body text-center">
+                <i class="bi bi-piggy-bank feature-icon text-warning"></i>
+                <h5 class="card-title">Budget Planning</h5>
+                <p class="card-text">Set budgets for different categories and track your spending habits.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h3 class="mb-0 text-center"><i class="bi bi-question-circle"></i> How It Works</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center mb-3 mb-md-0">
+                        <div class="step-number bg-primary text-white rounded-circle mx-auto mb-2">1</div>
+                        <h5>Register</h5>
+                        <p>Create your account with basic information</p>
+                    </div>
+                    <div class="col-md-3 text-center mb-3 mb-md-0">
+                        <div class="step-number bg-primary text-white rounded-circle mx-auto mb-2">2</div>
+                        <h5>Add Accounts</h5>
+                        <p>Set up your bank accounts and credit cards</p>
+                    </div>
+                    <div class="col-md-3 text-center mb-3 mb-md-0">
+                        <div class="step-number bg-primary text-white rounded-circle mx-auto mb-2">3</div>
+                        <h5>Record Transactions</h5>
+                        <p>Log your income, expenses, and transfers</p>
+                    </div>
+                    <div class="col-md-3 text-center mb-3 mb-md-0">
+                        <div class="step-number bg-primary text-white rounded-circle mx-auto mb-2">4</div>
+                        <h5>Analyze</h5>
+                        <p>View reports and insights on your spending</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-success text-white text-center">
+            <div class="card-body py-4">
+                <h3 class="card-title">Ready to take control of your finances?</h3>
+                <p class="card-text">Join thousands of users who are already managing their money smarter with PaisaTrack.</p>
+                <a href="/register" class="btn btn-light btn-lg">
+                    <i class="bi bi-person-plus"></i> Get Started Now - It's Free!
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Testimonials Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h3 class="text-center mb-4">What Our Users Say</h3>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <p class="card-text">"PaisaTrack helped me save 20% of my monthly income by tracking where every rupee goes."</p>
+                <div class="d-flex align-items-center">
+                    <div class="ms-3">
+                        <h6 class="mb-0">Rajesh Kumar</h6>
+                        <small class="text-muted">Software Engineer</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <p class="card-text">"The budgeting feature is a game-changer. I finally paid off my credit card debt using this app."</p>
+                <div class="d-flex align-items-center">
+                    <div class="ms-3">
+                        <h6 class="mb-0">Priya Sharma</h6>
+                        <small class="text-muted">Marketing Manager</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

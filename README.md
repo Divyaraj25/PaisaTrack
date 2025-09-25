@@ -13,8 +13,9 @@ PaisaTrack is a comprehensive personal finance management web application built 
 - [Database Setup](#database-setup)
 - [Running the Application](#running-the-application)
 - [Usage](#usage)
-- [Screenshots](#screenshots)
+- [Authentication](#authentication)
 - [API Endpoints](#api-endpoints)
+- [Screenshots](#screenshots)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -28,6 +29,9 @@ PaisaTrack is a comprehensive personal finance management web application built 
 - **Reporting**: Detailed transaction history with filtering and pagination
 - **Responsive Design**: Works on desktop, tablet, and mobile devices
 - **Data Persistence**: MongoDB database for reliable data storage
+- **User Authentication**: Secure user registration and login with JWT tokens
+- **Data Isolation**: Each user has their own private data
+- **Password Recovery**: Forgot password functionality with email verification
 
 ## Technologies Used
 
@@ -37,6 +41,7 @@ PaisaTrack is a comprehensive personal finance management web application built 
 - **Template Engine**: Jinja2
 - **Styling**: Bootstrap 5, Custom CSS
 - **Icons**: Bootstrap Icons
+- **Authentication**: JWT (JSON Web Tokens)
 
 ## Project Structure
 
@@ -49,10 +54,12 @@ paisatrack/
 ├── .gitignore             # Git ignore file
 │
 ├── models/
-│   └── finance.py         # Finance model with database operations
+│   ├── finance.py         # Finance model with database operations
+│   └── user.py            # User model with authentication
 │
 ├── routes/
-│   └── main.py            # Flask routes and controllers
+│   ├── main.py            # Flask routes and controllers
+│   └── auth.py            # Authentication routes
 │
 ├── utils/
 │   └── database.py        # Database connection utilities
@@ -68,7 +75,12 @@ paisatrack/
 │   ├── add_budget.html    # Add new budget page
 │   ├── categories.html    # Categories management page
 │   ├── manage_categories.html # Manage categories page
-│   └── info.html          # Information page
+│   ├── info.html          # Information page
+│   ├── login.html         # User login page
+│   ├── register.html      # User registration page
+│   ├── profile.html       # User profile page
+│   ├── forgot_password.html # Forgot password page
+│   └── reset_password.html # Reset password page
 │
 ├── static/
 │   ├── css/
@@ -111,7 +123,7 @@ paisatrack/
 
 3. **Install required packages**:
    ```bash
-   pip install flask pymongo
+   pip install -r requirements.txt
    ```
 
 4. **Install MongoDB**:
@@ -134,6 +146,7 @@ paisatrack/
    - Create the `paisatrackIN` database
    - Initialize default categories
    - Set up default information data
+   - Prepare user collection with proper indexes
 
 ## Running the Application
 
@@ -179,6 +192,54 @@ paisatrack/
 2. Click "Manage Categories"
 3. Add or remove categories as needed
 
+## Authentication
+
+PaisaTrack now includes user authentication to ensure each user's financial data remains private and secure.
+
+### Registration
+
+1. Navigate to the registration page (`/register`)
+2. Fill in your details:
+   - Username
+   - Email address
+   - Contact number
+   - Password (minimum 6 characters)
+3. Click "Register"
+4. You'll be automatically logged in and redirected to the dashboard
+
+### Login
+
+1. Navigate to the login page (`/login`)
+2. Enter your username and password
+3. Click "Login"
+4. You'll be redirected to the dashboard
+
+### Forgot Password
+
+1. Navigate to the login page (`/login`)
+2. Click "Forgot Password?" link
+3. Enter your email address
+4. If the email exists in the system, you'll receive a reset link
+5. Click the reset link to set a new password
+6. Login with your new password
+
+### Profile Management
+
+1. Click on your username in the top navigation bar
+2. View your profile information
+3. Update your details as needed
+4. Change your password (coming soon)
+5. Logout when finished
+
+### Security Features
+
+- Passwords are securely hashed using Werkzeug
+- JWT tokens for session management
+- Token expiration after 24 hours
+- Automatic token validation on all protected routes
+- Data isolation - users can only access their own data
+- Password recovery with secure token-based reset
+
 ## Screenshots
 
 ### Dashboard
@@ -220,9 +281,11 @@ paisatrack/
 
 ### Models (`models/`)
 - `finance.py`: Contains the FinanceModel class with all database operations for accounts, transactions, budgets, categories, and info.
+- `user.py`: Contains the UserModel class with authentication logic.
 
 ### Routes (`routes/`)
 - `main.py`: Contains all Flask routes and controller logic for the application.
+- `auth.py`: Contains authentication routes for user registration and login.
 
 ### Utilities (`utils/`)
 - `database.py`: Database connection utilities and helper functions.

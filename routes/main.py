@@ -5,19 +5,127 @@ import calendar
 
 main = Blueprint('main', __name__)
 
-# Global model variable
-model = None
-
 def get_model():
-    """Get or initialize the model"""
-    global model
-    if model is None:
-        model = FinanceModel()
-    return model
+    """Get model with user context if available"""
+    # Check if user_id is available in g (from token verification)
+    user_id = getattr(g, 'user_id', None)
+    return FinanceModel(user_id)
+
+def require_auth():
+    """Check if user is authenticated"""
+    user_id = getattr(g, 'user_id', None)
+    return user_id is not None
+
+def calculate_balances(accounts, transactions):
+    """Calculate current balance for all accounts"""
+    # Initialize balances with initial amounts
+    balances = {account['account_type']: account['initial_amount'] for account in accounts}
+    
+    # Process all transactions
+    for transaction in transactions:
+        if transaction["type"] == "income":
+            if transaction["account"] in balances:
+                balances[transaction["account"]] += transaction["amount"]
+        
+        elif transaction["type"] == "expense":
+            if transaction["account"] in balances:
+                balances[transaction["account"]] -= transaction["amount"]
+        
+        elif transaction["type"] == "transfer":
+            # Special handling for credit card payments
+            if transaction["category"] == "Credit Card Payment" and transaction["to_account"] == "Credit Card":
+                # Paying off credit card debt (reducing liability)
+                if transaction["from_account"] in balances:
+                    balances[transaction["from_account"]] -= transaction["amount"]
+                
+                if transaction["to_account"] in balances:
+                    # For credit cards, reducing debt means increasing the balance (towards zero)
+                    # Since credit card balances are negative, we ADD to reduce the debt
+                    balances[transaction["to_account"]] += transaction["amount"]
+            else:
+                # Regular transfer
+                if transaction["from_account"] in balances:
+                    balances[transaction["from_account"]] -= transaction["amount"]
+                
+                if transaction["to_account"] in balances:
+                    balances[transaction["to_account"]] += transaction["amount"]
+    
+    return balances
 
 @main.route('/')
 def index():
-    """Home page - shows account balances"""
+    """Public home page - shows help and information only"""
+    # Always show public home page for root route
+    return render_template('public_home.html')
+
+@main.route('/dashboard')
+def dashboard():
+    """Dashboard page - requires authentication"""
+    # For the initial page load, we'll show the dashboard template
+    # Authentication will be handled by the frontend JavaScript
+    # which will redirect to login if no token is found
+    
+    # Get user model (will be None if not authenticated)
+    model = get_model()
+    
+    # Try to get accounts and transactions
+    # If not authenticated, these will be empty lists
+    try:
+        accounts = model.get_accounts()
+        transactions = model.get_transactions()
+        
+        # Calculate current balances
+        balances = calculate_balances(accounts, transactions)
+        
+        # Calculate total assets, liabilities, and net worth
+        total_assets = 0
+        total_liabilities = 0
+        
+        for account_type, balance in balances.items():
+            account = next((acc for acc in accounts if acc['account_type'] == account_type), None)
+            if account:
+                if account_type == "Credit Card":
+                    # For credit cards, the balance represents debt (negative value)
+                    # Liability is the absolute value of the negative balance
+                    if balance < 0:
+                        total_liabilities += abs(balance)
+                    else:
+                        # If balance is positive, it means we've overpaid (credit)
+                        # This should count as a negative liability (asset)
+                        total_liabilities -= balance  # Subtract because it's a credit
+                else:
+                    if balance >= 0:
+                        total_assets += balance
+                    else:
+                        total_liabilities += abs(balance)
+        
+        net_worth = total_assets - total_liabilities
+        
+        return render_template('dashboard.html', 
+                              accounts=accounts, 
+                              transactions=transactions,
+                              balances=balances,
+                              total_assets=total_assets,
+                              total_liabilities=total_liabilities,
+                              net_worth=net_worth)
+    except Exception as e:
+        # If there's an authentication error, return empty data
+        # The frontend JavaScript will handle redirecting to login
+        return render_template('dashboard.html', 
+                              accounts=[], 
+                              transactions=[],
+                              balances={},
+                              total_assets=0,
+                              total_liabilities=0,
+                              net_worth=0)
+
+# API endpoints for dashboard data
+@main.route('/api/dashboard/summary')
+def api_dashboard_summary():
+    """API endpoint for dashboard summary data"""
+    if not require_auth():
+        return jsonify({'error': 'Authentication required'}), 401
+    
     model = get_model()
     
     accounts = model.get_accounts()
@@ -50,17 +158,91 @@ def index():
     
     net_worth = total_assets - total_liabilities
     
-    return render_template('index.html', 
-                          accounts=accounts, 
-                          transactions=transactions,
-                          balances=balances,
-                          total_assets=total_assets,
-                          total_liabilities=total_liabilities,
-                          net_worth=net_worth)
+    return jsonify({
+        'total_assets': total_assets,
+        'total_liabilities': total_liabilities,
+        'net_worth': net_worth
+    })
+
+@main.route('/api/dashboard/accounts')
+def api_dashboard_accounts():
+    """API endpoint for dashboard accounts data"""
+    if not require_auth():
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    model = get_model()
+    
+    accounts = model.get_accounts()
+    transactions = model.get_transactions()
+    
+    # Calculate current balances
+    balances = calculate_balances(accounts, transactions)
+    
+    # Add balance to each account
+    for account in accounts:
+        account['balance'] = balances.get(account['account_type'], 0)
+    
+    return jsonify(accounts)
+
+@main.route('/api/dashboard/recent-transactions')
+def api_dashboard_recent_transactions():
+    """API endpoint for recent transactions"""
+    if not require_auth():
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    model = get_model()
+    
+    # Get last 10 transactions
+    transactions = model.get_transactions()
+    
+    # Sort by date (newest first) and take last 10
+    transactions.sort(key=lambda x: x['date'], reverse=True)
+    recent_transactions = transactions[:10]
+    
+    return jsonify(recent_transactions)
+
+@main.route('/api/dashboard/budgets')
+def api_dashboard_budgets():
+    """API endpoint for active budgets"""
+    if not require_auth():
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    model = get_model()
+    
+    budgets = model.get_budgets()
+    transactions = model.get_transactions()
+    
+    # Add status and spending info to each budget
+    today = datetime.now().strftime("%Y-%m-%d")
+    active_budgets = []
+    
+    for budget in budgets:
+        # Check if budget is active
+        is_active = budget["start_date"] <= today <= budget["end_date"]
+        if not is_active:
+            continue
+            
+        # Calculate spent amount for this budget period
+        spent = 0
+        for transaction in transactions:
+            if (transaction["type"] == "expense" and 
+                transaction["category"] == budget["category"] and
+                budget["start_date"] <= transaction["date"] <= budget["end_date"]):
+                spent += transaction["amount"]
+        
+        budget["spent"] = spent
+        budget["remaining"] = budget["amount"] - spent
+        budget["percentage"] = (spent / budget["amount"]) * 100 if budget["amount"] > 0 else 0
+        
+        active_budgets.append(budget)
+    
+    return jsonify(active_budgets)
 
 @main.route('/accounts')
 def accounts():
     """View all accounts"""
+    # Let frontend JavaScript handle authentication
+    # This prevents the flash of login page issue
     model = get_model()
     
     accounts = model.get_accounts()
@@ -69,6 +251,8 @@ def accounts():
 @main.route('/accounts/add', methods=['GET', 'POST'])
 def add_account():
     """Add a new account"""
+    # Let frontend JavaScript handle authentication
+    # This prevents the flash of login page issue
     model = get_model()
     
     if request.method == 'POST':
@@ -96,6 +280,8 @@ def add_account():
 @main.route('/transactions')
 def transactions():
     """View all transactions"""
+    # Let frontend JavaScript handle authentication
+    # This prevents the flash of login page issue
     model = get_model()
     
     accounts = model.get_accounts()
@@ -151,6 +337,8 @@ def transactions():
 @main.route('/transactions/add', methods=['GET', 'POST'])
 def add_transaction():
     """Add a new transaction"""
+    # Let frontend JavaScript handle authentication
+    # This prevents the flash of login page issue
     model = get_model()
     
     accounts = model.get_accounts()
@@ -225,6 +413,8 @@ def add_transaction():
 @main.route('/budgets')
 def budgets():
     """View all budgets"""
+    # Let frontend JavaScript handle authentication
+    # This prevents the flash of login page issue
     model = get_model()
     
     budgets = model.get_budgets()
@@ -254,6 +444,8 @@ def budgets():
 @main.route('/budgets/add', methods=['GET', 'POST'])
 def add_budget():
     """Add a new budget"""
+    # Let frontend JavaScript handle authentication
+    # This prevents the flash of login page issue
     model = get_model()
     
     categories = model.get_categories()
@@ -302,6 +494,8 @@ def add_budget():
 @main.route('/categories')
 def categories():
     """View all categories"""
+    # Let frontend JavaScript handle authentication
+    # This prevents the flash of login page issue
     model = get_model()
     
     categories = model.get_categories()
@@ -310,6 +504,8 @@ def categories():
 @main.route('/categories/manage', methods=['GET', 'POST'])
 def manage_categories():
     """Manage categories"""
+    # Let frontend JavaScript handle authentication
+    # This prevents the flash of login page issue
     model = get_model()
     
     categories = model.get_categories()
@@ -337,45 +533,26 @@ def manage_categories():
 
 @main.route('/info')
 def info():
-    """View information page"""
-    model = get_model()
+    """View information page - info is common for all users"""
+    # Use FinanceModel without user context for info page
+    model = FinanceModel()
     
     info_data = model.get_info()
     return render_template('info.html', info=info_data)
 
-# Helper functions
-def calculate_balances(accounts, transactions):
-    """Calculate current balance for all accounts"""
-    # Initialize balances with initial amounts
-    balances = {account['account_type']: account['initial_amount'] for account in accounts}
-    
-    # Process all transactions
-    for transaction in transactions:
-        if transaction["type"] == "income":
-            if transaction["account"] in balances:
-                balances[transaction["account"]] += transaction["amount"]
-        
-        elif transaction["type"] == "expense":
-            if transaction["account"] in balances:
-                balances[transaction["account"]] -= transaction["amount"]
-        
-        elif transaction["type"] == "transfer":
-            # Special handling for credit card payments
-            if transaction["category"] == "Credit Card Payment" and transaction["to_account"] == "Credit Card":
-                # Paying off credit card debt (reducing liability)
-                if transaction["from_account"] in balances:
-                    balances[transaction["from_account"]] -= transaction["amount"]
-                
-                if transaction["to_account"] in balances:
-                    # For credit cards, reducing debt means increasing the balance (towards zero)
-                    # Since credit card balances are negative, we ADD to reduce the debt
-                    balances[transaction["to_account"]] += transaction["amount"]
-            else:
-                # Regular transfer
-                if transaction["from_account"] in balances:
-                    balances[transaction["from_account"]] -= transaction["amount"]
-                
-                if transaction["to_account"] in balances:
-                    balances[transaction["to_account"]] += transaction["amount"]
-    
-    return balances
+@main.route('/login')
+def login_page():
+    """Login page"""
+    return render_template('login.html')
+
+@main.route('/register')
+def register_page():
+    """Registration page"""
+    return render_template('register.html')
+
+@main.route('/profile')
+def profile_page():
+    """User profile page"""
+    # Let frontend JavaScript handle authentication
+    # This prevents the flash of login page issue
+    return render_template('profile.html')

@@ -746,3 +746,90 @@ html, body {
     height: 30px;
     width: auto;
 }
+
+/* Public Home Page Styles */
+.feature-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Dashboard Styles */
+.balance-card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.balance-card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.btn-action {
+    min-width: 150px;
+    margin: 5px;
+}
+
+.tip-card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.project-icon {
+    height: 60px;
+    width: auto;
+}
+
+.brand-container {
+    display: flex;
+    align-items: center;
+}
+
+.brand-name {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+
+.version-badge {
+    font-size: 0.6rem;
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 2px 5px;
+    border-radius: 4px;
+    margin-left: 5px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .btn-action {
+        min-width: 120px;
+        margin: 3px;
+        font-size: 0.9rem;
+    }
+    
+    .project-icon {
+        height: 40px;
+    }
+    
+    .brand-name {
+        font-size: 1rem;
+    }
+}

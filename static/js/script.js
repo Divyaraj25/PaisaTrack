@@ -1,5 +1,31 @@
 // Script for PaisaTrack
 
+// Function to get authentication headers
+function getAuthHeaders() {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+        return {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        };
+    }
+    return {
+        'Content-Type': 'application/json'
+    };
+}
+
+// Function to check if user is authenticated
+function isAuthenticated() {
+    return !!localStorage.getItem('authToken');
+}
+
+// Function to redirect to login if not authenticated
+function requireAuth() {
+    if (!isAuthenticated()) {
+        window.location.href = '/login';
+    }
+}
+
 // Function to format currency
 function formatCurrency(amount) {
     // Format as Indian Rupees
@@ -178,3 +204,78 @@ function toggleFilters() {
         }
     }
 }
+
+// Check authentication on page load and redirect if needed
+document.addEventListener('DOMContentLoaded', function() {
+    // Get current path
+    const path = window.location.pathname;
+    
+    // Define protected routes
+    const protectedRoutes = [
+        '/dashboard',
+        '/accounts',
+        '/accounts/add',
+        '/transactions',
+        '/transactions/add',
+        '/budgets',
+        '/budgets/add',
+        '/categories',
+        '/categories/manage',
+        '/profile'
+    ];
+    
+    // Check if current path is a protected route
+    const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route));
+    
+    // If it's a protected route and user is not authenticated, redirect to login
+    if (isProtectedRoute && !isAuthenticated()) {
+        window.location.href = '/login';
+    }
+    
+    // If user is authenticated and on login/register page, redirect to dashboard
+    const isAuthPage = path === '/login' || path === '/register';
+    if (isAuthPage && isAuthenticated()) {
+        window.location.href = '/dashboard';
+    }
+});
+
+// Intercept all AJAX requests to add auth token
+(function() {
+    const originalFetch = window.fetch;
+    window.fetch = function() {
+        const args = Array.prototype.slice.call(arguments);
+        const url = args[0];
+        const options = args[1] || {};
+        
+        // Add auth token to headers if user is authenticated
+        if (isAuthenticated()) {
+            options.headers = options.headers || {};
+            if (!options.headers['Authorization']) {
+                options.headers['Authorization'] = 'Bearer ' + localStorage.getItem('authToken');
+            }
+        }
+        
+        return originalFetch.apply(this, [url, options]);
+    };
+    
+    // Also intercept XMLHttpRequest for older code
+    const originalXHROpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function() {
+        const xhr = this;
+        const originalSend = xhr.send;
+        
+        xhr.addEventListener('readystatechange', function() {
+            if (xhr.readyState === 1) { // OPENED
+                if (isAuthenticated()) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('authToken'));
+                }
+            }
+        });
+        
+        xhr.send = function() {
+            return originalSend.apply(xhr, arguments);
+        };
+        
+        return originalXHROpen.apply(xhr, arguments);
+    };
+})();

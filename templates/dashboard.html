@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - PaisaTrack{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center py-4 py-md-5">
+                <img src="{{ url_for('static', filename='images/rupee.png') }}" alt="PaisaTrack Logo" class="img-fluid project-icon mb-3 mx-auto d-block">
+                <h1 class="card-title mt-3">Financial Dashboard</h1>
+                <p class="card-text lead">Track your finances and make informed decisions</p>
+                <p class="card-text">Real-time insights into your spending, saving, and financial health</p>
+                <div class="mt-3 d-flex flex-column flex-sm-row justify-content-center gap-2">
+                    <a href="{{ url_for('main.add_transaction') }}" class="btn btn-light btn-lg me-2 mb-2 mb-sm-0">
+                        <i class="bi bi-plus-circle"></i> Add Transaction
+                    </a>
+                    <a href="{{ url_for('main.accounts') }}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-wallet2"></i> View Accounts
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Balance Summary Cards -->
+<div class="row mb-4">
+    <div class="col-xl-4 col-md-6 col-sm-12 mb-3">
+        <div class="card balance-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-bank" style="font-size: 2rem;"></i>
+                <h5 class="card-title mt-2">Total Assets</h5>
+                <h3 class="card-text" id="totalAssets">₹{{ "%.2f"|format(total_assets|default(0)) }}</h3>
+                <p class="card-text"><small class="text-muted">All your positive account balances</small></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-6 col-sm-12 mb-3">
+        <div class="card balance-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-credit-card" style="font-size: 2rem;"></i>
+                <h5 class="card-title mt-2">Total Liabilities</h5>
+                <h3 class="card-text" id="totalLiabilities">₹{{ "%.2f"|format(total_liabilities|default(0)) }}</h3>
+                <p class="card-text"><small class="text-muted">Your debts and obligations</small></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-6 col-sm-12 mb-3">
+        <div class="card balance-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-bar-chart-line" style="font-size: 2rem;"></i>
+                <h5 class="card-title mt-2">Net Worth</h5>
+                <h3 class="card-text" id="netWorth">₹{{ "%.2f"|format(net_worth|default(0)) }}</h3>
+                <p class="card-text"><small class="text-muted">Assets minus liabilities</small></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Account Balances and Recent Transactions -->
+<div class="row mb-4">
+    <div class="col-lg-6 col-12 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <h5 class="mb-2 mb-md-0"><i class="bi bi-wallet2"></i> Account Balances</h5>
+                <a href="{{ url_for('main.accounts') }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-circle"></i> Manage Accounts
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive" id="accountsTable">
+                    {% if accounts %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Account</th>
+                                <th>Balance</th>
+                                <th>Credit Limit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for account in accounts %}
+                            <tr>
+                                <td>
+                                    <i class="bi bi-wallet"></i>
+                                    {{ account.account_type }}
+                                    {% if account.last_digits %}(****{{ account.last_digits }}){% endif %}
+                                    <br>
+                                    <small class="text-muted">{{ account.created_date }}</small>
+                                </td>
+                                <td>
+                                    <strong>
+                                        {% if account.account_type == "Credit Card" %}
+                                            {% set current_balance = balances[account.account_type] %}
+                                            {% if current_balance < 0 %}
+                                                <span class="text-danger"><i class="bi bi-arrow-down"></i> -₹{{ "%.2f"|format(current_balance|abs) }}</span>
+                                            {% else %}
+                                                <span class="text-success"><i class="bi bi-arrow-up"></i> ₹{{ "%.2f"|format(current_balance) }} (Credit)</span>
+                                            {% endif %}
+                                        {% else %}
+                                            {% if balances[account.account_type] >= 0 %}
+                                                <span class="text-success"><i class="bi bi-arrow-up"></i> ₹{{ "%.2f"|format(balances[account.account_type]) }}</span>
+                                            {% else %}
+                                                <span class="text-danger"><i class="bi bi-arrow-down"></i> -₹{{ "%.2f"|format(balances[account.account_type]|abs) }}</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </strong>
+                                </td>
+                                <td>
+                                    {% if account.account_type == "Credit Card" %}
+                                        ₹{{ "%.2f"|format(account.initial_amount|abs) }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-wallet" style="font-size: 3rem; color: #6c757d;"></i>
+                        <p class="text-muted mt-2">No accounts found.</p>
+                        <a href="{{ url_for('main.add_account') }}" class="btn btn-primary">Add your first account</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-12 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <h5 class="mb-2 mb-md-0"><i class="bi bi-arrow-left-right"></i> Recent Transactions</h5>
+                <a href="{{ url_for('main.transactions') }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-eye"></i> View All
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive" id="transactionsTable">
+                    {% set recent_transactions = transactions[-5:] %}
+                    {% if recent_transactions %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Account</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in recent_transactions|reverse %}
+                            <tr>
+                                <td><i class="bi bi-calendar"></i> {{ transaction.date }}</td>
+                                <td>
+                                    <span class="badge bg-{% if transaction.type == 'income' %}success{% elif transaction.type == 'expense' %}danger{% else %}info{% endif %}">
+                                        {% if transaction.type == 'income' %}
+                                            <i class="bi bi-arrow-down"></i> {{ transaction.type|title }}
+                                        {% elif transaction.type == 'expense' %}
+                                            <i class="bi bi-arrow-up"></i> {{ transaction.type|title }}
+                                        {% else %}
+                                            <i class="bi bi-arrow-left-right"></i> {{ transaction.type|title }}
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if transaction.type == 'transfer' %}
+                                        <i class="bi bi-arrow-left-right"></i> {{ transaction.from_account }} → {{ transaction.to_account }}
+                                    {% else %}
+                                        <i class="bi bi-wallet"></i> {{ transaction.account }}
+                                    {% endif %}
+                                </td>
+                                <td><i class="bi bi-tag"></i> {{ transaction.category }}</td>
+                                <td>
+                                    {% if transaction.type == 'income' %}
+                                        <span class="text-success"><i class="bi bi-plus-circle"></i> +₹{{ "%.2f"|format(transaction.amount) }}</span>
+                                    {% elif transaction.type == 'expense' %}
+                                        <span class="text-danger"><i class="bi bi-dash-circle"></i> -₹{{ "%.2f"|format(transaction.amount) }}</span>
+                                    {% else %}
+                                        <span class="text-info"><i class="bi bi-arrow-left-right"></i> ₹{{ "%.2f"|format(transaction.amount) }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-arrow-left-right" style="font-size: 3rem; color: #6c757d;"></i>
+                        <p class="text-muted mt-2">No transactions recorded yet.</p>
+                        <a href="{{ url_for('main.add_transaction') }}" class="btn btn-primary">Add your first transaction</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Budget Overview -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <h5 class="mb-2 mb-md-0"><i class="bi bi-piggy-bank"></i> Budget Overview</h5>
+                <a href="{{ url_for('main.budgets') }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-eye"></i> View All Budgets
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive" id="budgetsTable">
+                    <div id="budgetsLoader" class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <a href="{{ url_for('main.add_transaction') }}?type=income" class="btn btn-success btn-action">
+                        <i class="bi bi-plus-circle"></i> Add Income
+                    </a>
+                    <a href="{{ url_for('main.add_transaction') }}?type=expense" class="btn btn-danger btn-action">
+                        <i class="bi bi-dash-circle"></i> Add Expense
+                    </a>
+                    <a href="{{ url_for('main.add_transaction') }}?type=transfer" class="btn btn-info btn-action">
+                        <i class="bi bi-arrow-left-right"></i> Add Transfer
+                    </a>
+                    <a href="{{ url_for('main.add_budget') }}" class="btn btn-warning btn-action">
+                        <i class="bi bi-piggy-bank"></i> Set Budget
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Function to format currency
+    function formatCurrency(amount) {
+        return "₹" + amount.toLocaleString('en-IN', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    // Function to check if user is authenticated
+    function isAuthenticated() {
+        return !!localStorage.getItem('authToken');
+    }
+
+    // Function to redirect to login if not authenticated
+    function requireAuth() {
+        if (!isAuthenticated()) {
+            window.location.href = '/login';
+            return false;
+        }
+        return true;
+    }
+
+    // Function to load dashboard data
+    async function loadDashboardData() {
+        // Check authentication first
+        if (!requireAuth()) {
+            return;
+        }
+        
+        try {
+            // Load budgets data
+            const budgetsResponse = await fetch('/api/dashboard/budgets');
+            if (budgetsResponse.status === 401) {
+                // Token expired or invalid, redirect to login
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userData');
+                window.location.href = '/login';
+                return;
+            }
+            const budgetsData = await budgetsResponse.json();
+            updateBudgetsTable(budgetsData);
+        } catch (error) {
+            console.error('Error loading dashboard data:', error);
+        }
+    }
+
+    // Function to update budgets table
+    function updateBudgetsTable(budgets) {
+        const tableContainer = document.getElementById('budgetsTable');
+        const loader = document.getElementById('budgetsLoader');
+        
+        // Hide loader
+        loader.style.display = 'none';
+        
+        if (budgets.length === 0) {
+            tableContainer.innerHTML = `
+                <div class="text-center py-4">
+                    <i class="bi bi-piggy-bank" style="font-size: 3rem; color: #6c757d;"></i>
+                    <p class="text-muted mt-2">No budgets set up yet.</p>
+                    <a href="{{ url_for('main.add_budget') }}" class="btn btn-primary">Create your first budget</a>
+                </div>
+            `;
+            return;
+        }
+        
+        let tableHtml = `
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Period</th>
+                        <th>Budget</th>
+                        <th>Spent</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        budgets.forEach(budget => {
+            const percentage = budget.percentage || 0;
+            let statusBadge = '';
+            if (percentage < 50) {
+                statusBadge = `<span class="badge bg-success">On Track</span>`;
+            } else if (percentage < 80) {
+                statusBadge = `<span class="badge bg-warning text-dark">Warning</span>`;
+            } else if (percentage < 100) {
+                statusBadge = `<span class="badge bg-danger">Over Budget</span>`;
+            } else {
+                statusBadge = `<span class="badge bg-danger">Exceeded</span>`;
+            }
+            
+            tableHtml += `
+                <tr>
+                    <td><i class="bi bi-tag"></i> ${budget.category}</td>
+                    <td>${budget.start_date} to ${budget.end_date}</td>
+                    <td>${formatCurrency(budget.amount)}</td>
+                    <td>${formatCurrency(budget.spent)}</td>
+                    <td>${statusBadge}</td>
+                </tr>
+            `;
+        });
+        
+        tableHtml += `
+                </tbody>
+            </table>
+        `;
+        
+        tableContainer.innerHTML = tableHtml;
+    }
+
+    // Load dashboard data when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadDashboardData();
+    });
+</script>
+{% endblock %}
