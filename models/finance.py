@@ -13,14 +13,14 @@ class FinanceModel:
         self.categories_collection = self.db.categories
         self.info_collection = self.db.info
         self.user_id = user_id
-    
+
     def load_json_file(self, filename):
         """Load data from JSON file"""
         if os.path.exists(filename):
             with open(filename, 'r') as f:
                 return json.load(f)
         return None
-    
+
     # Account methods
     def get_accounts(self):
         """Get all accounts for the user"""
@@ -31,7 +31,7 @@ class FinanceModel:
         except Exception as e:
             print(f"Error getting accounts: {e}")
             return []
-    
+
     def get_account(self, account_type):
         """Get a specific account for the user"""
         if not self.user_id:
@@ -41,260 +41,232 @@ class FinanceModel:
         except Exception as e:
             print(f"Error getting account {account_type}: {e}")
             return None
-    
+
     def create_account(self, account_data):
-        """Create a new account for the user"""
+        """Create a new account for the user. Returns inserted_id on success, None on failure."""
         if not self.user_id:
             return None
         try:
             account_data["user_id"] = self.user_id
-            return self.accounts_collection.insert_one(account_data)
+            result = self.accounts_collection.insert_one(account_data)
+            return result.inserted_id if result.acknowledged else None
         except Exception as e:
             print(f"Error creating account: {e}")
             return None
-    
+
     def update_account(self, account_type, account_data):
-        """Update an existing account for the user"""
+        """Update an existing account. Returns True on success, False on failure."""
         if not self.user_id:
-            return None
+            return False
         try:
-            return self.accounts_collection.update_one(
+            result = self.accounts_collection.update_one(
                 {"account_type": account_type, "user_id": self.user_id},
                 {"$set": account_data}
             )
+            return result.modified_count > 0
         except Exception as e:
             print(f"Error updating account {account_type}: {e}")
-            return None
-    
+            return False
+
     def delete_account(self, account_type):
-        """Delete an account for the user"""
+        """Delete an account. Returns True on success, False on failure."""
         if not self.user_id:
-            return None
+            return False
         try:
-            return self.accounts_collection.delete_one({"account_type": account_type, "user_id": self.user_id})
+            result = self.accounts_collection.delete_one({"account_type": account_type, "user_id": self.user_id})
+            return result.deleted_count > 0
         except Exception as e:
             print(f"Error deleting account {account_type}: {e}")
-            return None
-    
+            return False
+
     # Transaction methods
     def get_transactions(self, filter_query=None):
         """Get transactions with optional filter for the user"""
         if not self.user_id:
             return []
         try:
-            if filter_query is None:
-                filter_query = {}
-            filter_query["user_id"] = self.user_id
-            return list(self.transactions_collection.find(filter_query))
+            query = filter_query or {}
+            query["user_id"] = self.user_id
+            return list(self.transactions_collection.find(query))
         except Exception as e:
             print(f"Error getting transactions: {e}")
             return []
-    
+
     def get_transaction(self, transaction_id):
-        """Get a specific transaction for the user"""
+        """Get a specific transaction by its ID for the user"""
         if not self.user_id:
             return None
         try:
-            return self.transactions_collection.find_one({"_id": transaction_id, "user_id": self.user_id})
+            return self.transactions_collection.find_one({"_id": ObjectId(transaction_id), "user_id": self.user_id})
         except Exception as e:
             print(f"Error getting transaction {transaction_id}: {e}")
             return None
-    
+
     def create_transaction(self, transaction_data):
-        """Create a new transaction for the user"""
+        """Create a new transaction. Returns inserted_id on success, None on failure."""
         if not self.user_id:
             return None
         try:
             transaction_data["user_id"] = self.user_id
-            return self.transactions_collection.insert_one(transaction_data)
+            result = self.transactions_collection.insert_one(transaction_data)
+            return result.inserted_id if result.acknowledged else None
         except Exception as e:
             print(f"Error creating transaction: {e}")
             return None
-    
+
     def update_transaction(self, transaction_id, transaction_data):
-        """Update an existing transaction for the user"""
+        """Update a transaction. Returns True on success, False on failure."""
         if not self.user_id:
-            return None
+            return False
         try:
-            return self.transactions_collection.update_one(
-                {"_id": transaction_id, "user_id": self.user_id},
+            result = self.transactions_collection.update_one(
+                {"_id": ObjectId(transaction_id), "user_id": self.user_id},
                 {"$set": transaction_data}
             )
+            return result.modified_count > 0
         except Exception as e:
             print(f"Error updating transaction {transaction_id}: {e}")
-            return None
-    
+            return False
+
     def delete_transaction(self, transaction_id):
-        """Delete a transaction for the user"""
+        """Delete a transaction. Returns True on success, False on failure."""
         if not self.user_id:
-            return None
+            return False
         try:
-            return self.transactions_collection.delete_one({"_id": transaction_id, "user_id": self.user_id})
+            result = self.transactions_collection.delete_one({"_id": ObjectId(transaction_id), "user_id": self.user_id})
+            return result.deleted_count > 0
         except Exception as e:
             print(f"Error deleting transaction {transaction_id}: {e}")
-            return None
-    
+            return False
+
     # Budget methods
     def get_budgets(self, filter_query=None):
         """Get budgets with optional filter for the user"""
         if not self.user_id:
             return []
         try:
-            if filter_query is None:
-                filter_query = {}
-            filter_query["user_id"] = self.user_id
-            return list(self.budgets_collection.find(filter_query))
+            query = filter_query or {}
+            query["user_id"] = self.user_id
+            return list(self.budgets_collection.find(query))
         except Exception as e:
             print(f"Error getting budgets: {e}")
             return []
-    
+
     def get_budget(self, budget_id):
-        """Get a specific budget for the user"""
+        """Get a specific budget by its ID for the user"""
         if not self.user_id:
             return None
         try:
-            return self.budgets_collection.find_one({"_id": budget_id, "user_id": self.user_id})
+            return self.budgets_collection.find_one({"_id": ObjectId(budget_id), "user_id": self.user_id})
         except Exception as e:
             print(f"Error getting budget {budget_id}: {e}")
             return None
-    
+
     def create_budget(self, budget_data):
-        """Create a new budget for the user"""
+        """Create a new budget. Returns inserted_id on success, None on failure."""
         if not self.user_id:
             return None
         try:
             budget_data["user_id"] = self.user_id
-            return self.budgets_collection.insert_one(budget_data)
+            result = self.budgets_collection.insert_one(budget_data)
+            return result.inserted_id if result.acknowledged else None
         except Exception as e:
             print(f"Error creating budget: {e}")
             return None
-    
+
     def update_budget(self, budget_id, budget_data):
-        """Update an existing budget for the user"""
+        """Update a budget. Returns True on success, False on failure."""
         if not self.user_id:
-            return None
+            return False
         try:
-            return self.budgets_collection.update_one(
-                {"_id": budget_id, "user_id": self.user_id},
+            result = self.budgets_collection.update_one(
+                {"_id": ObjectId(budget_id), "user_id": self.user_id},
                 {"$set": budget_data}
             )
+            return result.modified_count > 0
         except Exception as e:
             print(f"Error updating budget {budget_id}: {e}")
-            return None
-    
+            return False
+
     def delete_budget(self, budget_id):
-        """Delete a budget for the user"""
+        """Delete a budget. Returns True on success, False on failure."""
         if not self.user_id:
-            return None
+            return False
         try:
-            return self.budgets_collection.delete_one({"_id": budget_id, "user_id": self.user_id})
+            result = self.budgets_collection.delete_one({"_id": ObjectId(budget_id), "user_id": self.user_id})
+            return result.deleted_count > 0
         except Exception as e:
             print(f"Error deleting budget {budget_id}: {e}")
-            return None
-    
+            return False
+
     # Category methods
     def get_categories(self):
-        """Get all categories for the user"""
-        if not self.user_id:
-            # Return default categories if no user is authenticated
-            return self.load_json_file('categories.json') or self.get_default_categories()
+        """Get categories for the user, or default if not set."""
+        # If user is authenticated, try to find their categories first
+        if self.user_id:
+            try:
+                categories = self.categories_collection.find_one({"user_id": self.user_id})
+                if categories:
+                    # Clean up internal fields before returning
+                    if '_id' in categories:
+                        del categories['_id']
+                    if 'user_id' in categories:
+                        del categories['user_id']
+                    return categories
+            except Exception as e:
+                print(f"Error getting user-specific categories: {e}")
         
-        try:
-            categories = self.categories_collection.find_one({"user_id": self.user_id})
-            if categories:
-                if '_id' in categories:
-                    del categories['_id']
-                if 'user_id' in categories:
-                    del categories['user_id']
-                return categories
-        except Exception as e:
-            print(f"Error getting categories: {e}")
-        
-        # Load from JSON file if no categories in database
-        categories_data = self.load_json_file('categories.json')
-        if categories_data:
-            return categories_data
-        
-        # Return default categories if none exist or error occurred
-        return self.get_default_categories()
+        # Fallback for unauthenticated users or if user has no categories
+        default_categories = self.load_json_file('categories.json')
+        return default_categories or self.get_default_categories()
 
     def get_default_categories(self):
-        """Returns a default set of categories."""
+        """Returns a default set of categories if JSON is missing."""
         return {
-            "income": ["Salary", "Freelance", "Investment", "Gift", "Business", "Bonus", "Dividend", "Rental Income", "Other"],
-            "expense": ["Food", "Transport", "Entertainment", "Utilities", "Rent", "Healthcare", 
-                       "Education", "Shopping", "Travel", "Personal Care", "Insurance", "Taxes", 
-                       "Subscriptions", "Maintenance", "Charity", "Other"],
-            "transfer": ["Cash to Bank", "Bank to Card", "Card to Cash", "Between Accounts", 
-                        "Credit Card Payment", "Bank Transfer", "Investment Transfer", "Loan Payment"]
+            "income": ["Salary", "Freelance", "Investment", "Gift", "Business", "Bonus"],
+            "expense": ["Food", "Transport", "Entertainment", "Utilities", "Rent", "Healthcare"],
+            "transfer": ["Cash to Bank", "Bank to Card", "Credit Card Payment"]
         }
 
     def update_categories(self, categories_data):
-        """Update categories for the user"""
+        """Update categories for the user. Returns True on success, False on failure."""
         if not self.user_id:
-            return None
+            return False
         try:
-            # Ensure user_id is set for the query
             query = {"user_id": self.user_id}
+            # Remove _id from data if it exists to prevent update errors
+            if '_id' in categories_data:
+                del categories_data['_id']
             
-            # Prepare the update data, ensuring user_id is included
             update_data = {"$set": categories_data}
-            
-            # Use upsert to create if it doesn't exist or update if it does
-            return self.categories_collection.update_one(query, update_data, upsert=True)
+            result = self.categories_collection.update_one(query, update_data, upsert=True)
+            # Success if a document was inserted or modified
+            return result.upserted_id is not None or result.modified_count > 0
         except Exception as e:
             print(f"Error updating categories: {e}")
-            return None
-    
+            return False
+
     # Info methods (common for all users)
     def get_info(self):
         """Get info data - common for all users"""
         try:
-            info = self.info_collection.find_one()
-            if info:
-                return info
+            return self.info_collection.find_one() or {}
         except Exception as e:
             print(f"Error getting info: {e}")
-        
-        # Return default info if none exists or error occurred
-        return self.load_json_file("finance_info.json")
-    
-    def update_info(self, info_data):
-        """Update info data - common for all users"""
-        try:
-            existing = self.info_collection.find_one()
-            if existing:
-                return self.info_collection.update_one(
-                    {"_id": existing["_id"]},
-                    {"$set": info_data}
-                )
-            else:
-                return self.info_collection.insert_one(info_data)
-        except Exception as e:
-            print(f"Error updating info: {e}")
-            return None
-    
+            return {}
+
     # Initialize default data
     def initialize_default_data(self):
-        """Initialize default categories and info if they don't exist for the user"""
+        """Initializes default categories for a user if they don't exist."""
         if not self.user_id:
-            return
-
+            return False
         try:
-            # Check if categories exist for the user
-            categories_exist = self.categories_collection.find_one({"user_id": self.user_id})
-            if not categories_exist:
+            if self.categories_collection.count_documents({"user_id": self.user_id}) == 0:
                 default_categories = self.load_json_file('categories.json') or self.get_default_categories()
-                
-                # Add user_id to the default categories
                 default_categories["user_id"] = self.user_id
                 self.categories_collection.insert_one(default_categories)
-            
-            # Check if info exists (common for all users)
-            info_exist = self.info_collection.find_one()
-            if not info_exist:
-                default_info = self.load_json_file('finance_info.json')
-                if default_info:
-                    self.info_collection.insert_one(default_info)
+                return True
+            return False
         except Exception as e:
             print(f"Error initializing default data: {e}")
+            return False
