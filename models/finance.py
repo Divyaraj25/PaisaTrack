@@ -46,6 +46,7 @@ class FinanceModel:
 
     def create_account(self, account_data):
 <<<<<<< HEAD
+<<<<<<< HEAD
         """Create a new account for the user. Returns inserted_id on success, None on failure."""
         if not self.user_id:
             return None
@@ -56,6 +57,10 @@ class FinanceModel:
 =======
         """Create a new account for the user"""
         try:
+=======
+        """Create a new account for the user"""
+        try:
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
             if self.user_id:
                 account_data["user_id"] = self.user_id
             return self.accounts_collection.insert_one(account_data)
@@ -65,6 +70,7 @@ class FinanceModel:
             return None
 
     def update_account(self, account_type, account_data):
+<<<<<<< HEAD
 <<<<<<< HEAD
         """Update an existing account. Returns True on success, False on failure."""
         if not self.user_id:
@@ -78,6 +84,10 @@ class FinanceModel:
 =======
         """Update an existing account for the user"""
         try:
+=======
+        """Update an existing account for the user"""
+        try:
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
             if self.user_id:
                 return self.accounts_collection.update_one(
                     {"account_type": account_type, "user_id": self.user_id},
@@ -88,12 +98,16 @@ class FinanceModel:
                     {"account_type": account_type},
                     {"$set": account_data}
                 )
+<<<<<<< HEAD
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
+=======
 >>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
         except Exception as e:
             print(f"Error updating account {account_type}: {e}")
             return False
 
     def delete_account(self, account_type):
+<<<<<<< HEAD
 <<<<<<< HEAD
         """Delete an account. Returns True on success, False on failure."""
         if not self.user_id:
@@ -104,10 +118,17 @@ class FinanceModel:
 =======
         """Delete an account for the user"""
         try:
+=======
+        """Delete an account for the user"""
+        try:
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
             if self.user_id:
                 return self.accounts_collection.delete_one({"account_type": account_type, "user_id": self.user_id})
             else:
                 return self.accounts_collection.delete_one({"account_type": account_type})
+<<<<<<< HEAD
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
+=======
 >>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
         except Exception as e:
             print(f"Error deleting account {account_type}: {e}")
@@ -136,6 +157,7 @@ class FinanceModel:
 
     def get_transaction(self, transaction_id):
 <<<<<<< HEAD
+<<<<<<< HEAD
         """Get a specific transaction by its ID for the user"""
         if not self.user_id:
             return None
@@ -144,16 +166,24 @@ class FinanceModel:
 =======
         """Get a specific transaction for the user"""
         try:
+=======
+        """Get a specific transaction for the user"""
+        try:
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
             if self.user_id:
                 return self.transactions_collection.find_one({"_id": transaction_id, "user_id": self.user_id})
             else:
                 return self.transactions_collection.find_one({"_id": transaction_id})
+<<<<<<< HEAD
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
+=======
 >>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
         except Exception as e:
             print(f"Error getting transaction {transaction_id}: {e}")
             return None
 
     def create_transaction(self, transaction_data):
+<<<<<<< HEAD
 <<<<<<< HEAD
         """Create a new transaction. Returns inserted_id on success, None on failure."""
         if not self.user_id:
@@ -165,6 +195,10 @@ class FinanceModel:
 =======
         """Create a new transaction for the user"""
         try:
+=======
+        """Create a new transaction for the user"""
+        try:
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
             if self.user_id:
                 transaction_data["user_id"] = self.user_id
             return self.transactions_collection.insert_one(transaction_data)
@@ -174,6 +208,7 @@ class FinanceModel:
             return None
 
     def update_transaction(self, transaction_id, transaction_data):
+<<<<<<< HEAD
 <<<<<<< HEAD
         """Update a transaction. Returns True on success, False on failure."""
         if not self.user_id:
@@ -187,6 +222,10 @@ class FinanceModel:
 =======
         """Update an existing transaction for the user"""
         try:
+=======
+        """Update an existing transaction for the user"""
+        try:
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
             if self.user_id:
                 return self.transactions_collection.update_one(
                     {"_id": transaction_id, "user_id": self.user_id},
@@ -197,12 +236,16 @@ class FinanceModel:
                     {"_id": transaction_id},
                     {"$set": transaction_data}
                 )
+<<<<<<< HEAD
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
+=======
 >>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
         except Exception as e:
             print(f"Error updating transaction {transaction_id}: {e}")
             return False
 
     def delete_transaction(self, transaction_id):
+<<<<<<< HEAD
 <<<<<<< HEAD
         """Delete a transaction. Returns True on success, False on failure."""
         if not self.user_id:
@@ -213,10 +256,17 @@ class FinanceModel:
 =======
         """Delete a transaction for the user"""
         try:
+=======
+        """Delete a transaction for the user"""
+        try:
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
             if self.user_id:
                 return self.transactions_collection.delete_one({"_id": transaction_id, "user_id": self.user_id})
             else:
                 return self.transactions_collection.delete_one({"_id": transaction_id})
+<<<<<<< HEAD
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
+=======
 >>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
         except Exception as e:
             print(f"Error deleting transaction {transaction_id}: {e}")
@@ -245,6 +295,7 @@ class FinanceModel:
 
     def get_budget(self, budget_id):
 <<<<<<< HEAD
+<<<<<<< HEAD
         """Get a specific budget by its ID for the user"""
         if not self.user_id:
             return None
@@ -253,16 +304,24 @@ class FinanceModel:
 =======
         """Get a specific budget for the user"""
         try:
+=======
+        """Get a specific budget for the user"""
+        try:
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
             if self.user_id:
                 return self.budgets_collection.find_one({"_id": budget_id, "user_id": self.user_id})
             else:
                 return self.budgets_collection.find_one({"_id": budget_id})
+<<<<<<< HEAD
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
+=======
 >>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
         except Exception as e:
             print(f"Error getting budget {budget_id}: {e}")
             return None
 
     def create_budget(self, budget_data):
+<<<<<<< HEAD
 <<<<<<< HEAD
         """Create a new budget. Returns inserted_id on success, None on failure."""
         if not self.user_id:
@@ -274,6 +333,10 @@ class FinanceModel:
 =======
         """Create a new budget for the user"""
         try:
+=======
+        """Create a new budget for the user"""
+        try:
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
             if self.user_id:
                 budget_data["user_id"] = self.user_id
             return self.budgets_collection.insert_one(budget_data)
@@ -283,6 +346,7 @@ class FinanceModel:
             return None
 
     def update_budget(self, budget_id, budget_data):
+<<<<<<< HEAD
 <<<<<<< HEAD
         """Update a budget. Returns True on success, False on failure."""
         if not self.user_id:
@@ -296,6 +360,10 @@ class FinanceModel:
 =======
         """Update an existing budget for the user"""
         try:
+=======
+        """Update an existing budget for the user"""
+        try:
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
             if self.user_id:
                 return self.budgets_collection.update_one(
                     {"_id": budget_id, "user_id": self.user_id},
@@ -306,12 +374,16 @@ class FinanceModel:
                     {"_id": budget_id},
                     {"$set": budget_data}
                 )
+<<<<<<< HEAD
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
+=======
 >>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
         except Exception as e:
             print(f"Error updating budget {budget_id}: {e}")
             return False
 
     def delete_budget(self, budget_id):
+<<<<<<< HEAD
 <<<<<<< HEAD
         """Delete a budget. Returns True on success, False on failure."""
         if not self.user_id:
@@ -322,10 +394,17 @@ class FinanceModel:
 =======
         """Delete a budget for the user"""
         try:
+=======
+        """Delete a budget for the user"""
+        try:
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
             if self.user_id:
                 return self.budgets_collection.delete_one({"_id": budget_id, "user_id": self.user_id})
             else:
                 return self.budgets_collection.delete_one({"_id": budget_id})
+<<<<<<< HEAD
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
+=======
 >>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
         except Exception as e:
             print(f"Error deleting budget {budget_id}: {e}")
@@ -333,6 +412,7 @@ class FinanceModel:
 
     # Category methods
     def get_categories(self):
+<<<<<<< HEAD
 <<<<<<< HEAD
         """Get categories for the user, or default if not set."""
         # If user is authenticated, try to find their categories first
@@ -356,6 +436,8 @@ class FinanceModel:
     def get_default_categories(self):
         """Returns a default set of categories if JSON is missing."""
 =======
+=======
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
         """Get all categories for the user"""
         try:
             if self.user_id:
@@ -377,6 +459,9 @@ class FinanceModel:
             return categories_data
         
         # Return default categories if none exist or error occurred
+<<<<<<< HEAD
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
+=======
 >>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
         return {
             "income": ["Salary", "Freelance", "Investment", "Gift", "Business", "Bonus"],
@@ -385,6 +470,7 @@ class FinanceModel:
         }
     
     def update_categories(self, categories_data):
+<<<<<<< HEAD
 <<<<<<< HEAD
         """Update categories for the user. Returns True on success, False on failure."""
         if not self.user_id:
@@ -458,6 +544,38 @@ class FinanceModel:
     def get_info(self):
         """Get info data - common for all users"""
         try:
+=======
+        """Update categories for the user"""
+        try:
+            if self.user_id:
+                categories_data["user_id"] = self.user_id
+                # For simplicity, we'll replace the entire document
+                existing = self.categories_collection.find_one({"user_id": self.user_id})
+            else:
+                existing = self.categories_collection.find_one()
+                
+            if existing:
+                if self.user_id:
+                    return self.categories_collection.update_one(
+                        {"_id": existing["_id"]},
+                        {"$set": categories_data}
+                    )
+                else:
+                    return self.categories_collection.update_one(
+                        {"_id": existing["_id"]},
+                        {"$set": categories_data}
+                    )
+            else:
+                return self.categories_collection.insert_one(categories_data)
+        except Exception as e:
+            print(f"Error updating categories: {e}")
+            return None
+    
+    # Info methods
+    def get_info(self):
+        """Get info data - common for all users"""
+        try:
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
             # Info data is common for all users, so we don't filter by user_id
             info = self.info_collection.find_one()
             if info:
@@ -743,5 +861,9 @@ class FinanceModel:
                     }
                 self.info_collection.insert_one(default_info)
         except Exception as e:
+<<<<<<< HEAD
+            print(f"Error initializing default data: {e}")
+>>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
+=======
             print(f"Error initializing default data: {e}")
 >>>>>>> parent of 97d0d24 (updated from firebase studio of auth module and user isolation issue)
