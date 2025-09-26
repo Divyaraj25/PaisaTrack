@@ -12,6 +12,7 @@ PaisaTrack is a comprehensive personal finance management web application built 
 - [Setup and Installation](#setup-and-installation)
 - [Database Setup](#database-setup)
 - [Running the Application](#running-the-application)
+- [Testing](#testing)
 - [Usage](#usage)
 - [Authentication](#authentication)
 - [API Endpoints](#api-endpoints)
@@ -51,6 +52,7 @@ paisatrack/
 ├── app.py                 # Main application entry point
 ├── init_mongo.py          # Database initialization script
 ├── README.md              # Project documentation
+├── test_all.py            # All tests for the application
 ├── .gitignore             # Git ignore file
 │
 ├── models/
@@ -157,6 +159,16 @@ paisatrack/
 
 2. **Access the application**:
    Open your web browser and navigate to `http://localhost:5000`
+
+## Testing
+
+To run the tests for the application, run the following command:
+
+```bash
+python test_all.py
+```
+
+This will run all the unit tests for the application and provide a report.
 
 ## Usage
 
